@@ -1,28 +1,47 @@
 :root {
-  --primary-color: #6366f1;
-  /* Indigo 500 */
+  /* Brand Core Colors */
+  --primary-color: #6366f1;       /* Vibrant Indigo */
   --primary-hover: #4f46e5;
-  --secondary-color: #8b5cf6;
-  /* Violet 500 */
-  --bg-dark: #0f172a;
-  /* Slate 900 */
-  --bg-darker: #020617;
-  /* Slate 950 */
-  --bg-card: rgba(30, 41, 59, 0.55);
+  --secondary-color: #8b5cf6;     /* Royal Violet */
+
+  /* Realistic Departmental Accent Palette */
+  --color-hr: #a855f7;            /* Radiant Purple */
+  --color-sales: #10b981;         /* Emerald Mint */
+  --color-support: #0ea5e9;       /* Bright Sky Blue */
+  --color-admin: #6366f1;         /* Electric Indigo */
+  --color-coral: #f43f5e;         /* Sunset Rose */
+  --color-amber: #f59e0b;         /* Warm Gold */
+
+  /* Realistic Premium Backgrounds (Rich Navy & Pearl Slate) */
+  --bg-darker: #0c1222;           /* Deep Luminous Navy */
+  --bg-dark: #111a33;             /* Midnight Slate */
+  --bg-card: rgba(19, 29, 53, 0.72);
+  --bg-card-hover: rgba(26, 39, 70, 0.85);
+  --bg-glass: rgba(255, 255, 255, 0.04);
+
+  /* Typography Colors */
   --text-main: #f8fafc;
+  --text-sub: #cbd5e1;
   --text-muted: #94a3b8;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(15, 23, 42, 0.5);
-  --glass-border: rgba(255, 255, 255, 0.05);
 
-  --accent-glow: 0 0 25px rgba(99, 102, 241, 0.4);
-  --panel-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  /* Realistic Glassmorphic Borders & Highlights */
+  --border-color: rgba(255, 255, 255, 0.10);
+  --border-bright: rgba(255, 255, 255, 0.22);
+  --glass-border: rgba(255, 255, 255, 0.08);
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.75rem;
+  /* Multi-Tone Colorful Shadows & Glows */
+  --panel-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.4), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+  --glow-indigo: 0 0 25px rgba(99, 102, 241, 0.35);
+  --glow-emerald: 0 0 25px rgba(16, 185, 129, 0.35);
+  --glow-violet: 0 0 25px rgba(168, 85, 247, 0.35);
+  --glow-azure: 0 0 25px rgba(14, 165, 233, 0.35);
+
+  /* Radii & Transitions */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.85rem;
   --radius-lg: 1.25rem;
   --radius-full: 9999px;
 
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }

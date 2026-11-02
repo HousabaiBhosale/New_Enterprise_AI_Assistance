@@ -26,6 +26,12 @@ env/
 # Vector Store
 qdrant_data/
 
+# Generated Reports
+reports/*.pdf
+reports/*.xlsx
+backend/reports/*.pdf
+backend/reports/*.xlsx
+
 # OS generated files
 .DS_Store
 Thumbs.db

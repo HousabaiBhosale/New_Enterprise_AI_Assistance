@@ -6,7 +6,7 @@ export function CoordinationProvider({ children }) {
     const [threads, setThreads] = useState([
         { id: 1, title: 'Payroll Query regarding August Bonus', dept: 'hr', status: 'Active', time: '10:42 AM', preview: 'Could you clarify the tax deduction on...' },
         { id: 2, title: 'Sales enablement material request', dept: 'sales', status: 'Pending', time: 'Yesterday', preview: 'I need the new Q4 slide decks.' },
-        { id: 3, title: 'IT Support: VPN Access Issue', dept: 'support', status: 'Closed', time: 'Sep 12', preview: 'Your ticket has been resolved successfully.' },
+        { id: 3, title: 'IT Helpdesk: VPN Access Issue', dept: 'support', status: 'Closed', time: 'Sep 12', preview: 'Your helpdesk request has been resolved successfully.' },
     ]);
 
     const addThread = (dept, title, preview) => {
