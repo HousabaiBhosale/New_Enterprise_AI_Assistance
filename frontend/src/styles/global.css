@@ -120,6 +120,41 @@ ul {
     transform: translateY(-3px);
 }
 
+/* Light Theme Styling Overrides */
+[data-theme="light"] body {
+    background-color: var(--bg-darker);
+    color: var(--text-main);
+}
+
+[data-theme="light"] .glass-panel {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+    box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .glass-panel:hover {
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="light"] .glass-header {
+    background: rgba(255, 255, 255, 0.88);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+    background: rgba(241, 245, 249, 0.9);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.5);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
 /* Realistic Pulsing Live Beacon */
 .status-beacon {
     position: relative;

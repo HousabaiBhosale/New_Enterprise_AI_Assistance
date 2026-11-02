@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mail, Lock, ArrowRight, Loader2, Sparkles, Users, TrendingUp, 
   HelpCircle, Briefcase, KeyRound, Shield, CheckCircle2, 
-  ChevronLeft, ChevronRight, Pause, Play, Zap, Cpu, Sun, Moon, Gauge
+  ChevronLeft, ChevronRight, Pause, Play, Zap, Cpu, Sun, Moon
 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -15,7 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const { login, isLoading } = useAuth();
 
-  // Theme selection: 'dark' (default) or 'light'
+  // Theme selection: 'dark' or 'light'
   const [theme, setTheme] = useState(() => {
     return (typeof localStorage !== 'undefined' && localStorage.getItem('enterprise_theme')) || 'dark';
   });
@@ -28,6 +28,8 @@ export default function Login() {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('enterprise_theme', theme);
   }, [theme]);
+
+  const isLight = theme === 'light';
 
   // All 5 cards in circular order: Employee, HR, System Admin (center initial), Sales, Support
   const allRoles = [
@@ -180,9 +182,7 @@ export default function Login() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentRole]);
 
-  const isLight = theme === 'light';
-
-  // 3D Perspective Slot Calculations matching the reference image
+  // 3D Perspective Slot Calculations matching the user's reference image
   const getSlotStyle = (offset) => {
     const isMobile = windowWidth < 680;
     const isTablet = windowWidth >= 680 && windowWidth < 1024;
@@ -199,13 +199,13 @@ export default function Login() {
           rotateY: 0,
           scale: isMobile ? 0.98 : 1.08,
           opacity: 1,
-          filter: 'blur(0px) brightness(1.05)',
+          filter: 'blur(0px) brightness(1.04)',
           zIndex: 10,
           boxShadow: isLight
-            ? '0 0 35px rgba(59, 130, 246, 0.35), 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+            ? '0 0 28px rgba(37, 99, 235, 0.35), 0 22px 55px -12px rgba(15, 23, 42, 0.16), 0 0 0 1px #2563eb, inset 0 1px 0 #ffffff'
             : '0 0 35px rgba(59, 130, 246, 0.45), 0 25px 65px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
           border: isLight
-            ? '2px solid rgba(37, 99, 235, 0.8)'
+            ? '2px solid #2563eb'
             : '2px solid rgba(59, 130, 246, 0.8)',
         };
       case -1: // Near Left Card: 3D rotation, reduced scale, subtle blur
@@ -215,11 +215,11 @@ export default function Login() {
           z: 0,
           rotateY: 42,
           scale: isMobile ? 0.76 : 0.84,
-          opacity: isLight ? 0.75 : 0.65,
-          filter: 'blur(1px) brightness(0.72)',
+          opacity: isLight ? 0.90 : 0.65,
+          filter: isLight ? 'blur(0.3px) brightness(0.97)' : 'blur(1px) brightness(0.72)',
           zIndex: 6,
-          boxShadow: isLight ? '0 10px 25px rgba(0, 0, 0, 0.08)' : '0 15px 35px rgba(0, 0, 0, 0.6)',
-          border: isLight ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: isLight ? '0 16px 36px -8px rgba(15, 23, 42, 0.12), 0 0 1px rgba(15, 23, 42, 0.08)' : '0 15px 35px rgba(0, 0, 0, 0.6)',
+          border: isLight ? '1px solid rgba(203, 213, 225, 0.95)' : '1px solid rgba(255, 255, 255, 0.12)',
         };
       case 1: // Near Right Card: 3D rotation, reduced scale, subtle blur
         return {
@@ -228,11 +228,11 @@ export default function Login() {
           z: 0,
           rotateY: -42,
           scale: isMobile ? 0.76 : 0.84,
-          opacity: isLight ? 0.75 : 0.65,
-          filter: 'blur(1px) brightness(0.72)',
+          opacity: isLight ? 0.90 : 0.65,
+          filter: isLight ? 'blur(0.3px) brightness(0.97)' : 'blur(1px) brightness(0.72)',
           zIndex: 6,
-          boxShadow: isLight ? '0 10px 25px rgba(0, 0, 0, 0.08)' : '0 15px 35px rgba(0, 0, 0, 0.6)',
-          border: isLight ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: isLight ? '0 16px 36px -8px rgba(15, 23, 42, 0.12), 0 0 1px rgba(15, 23, 42, 0.08)' : '0 15px 35px rgba(0, 0, 0, 0.6)',
+          border: isLight ? '1px solid rgba(203, 213, 225, 0.95)' : '1px solid rgba(255, 255, 255, 0.12)',
         };
       case -2: // Far Left Card: Smaller, darker, steeper rotation (realistic depth effect)
         return {
@@ -241,11 +241,11 @@ export default function Login() {
           z: -100,
           rotateY: 62,
           scale: isMobile ? 0.58 : 0.66,
-          opacity: isLight ? 0.35 : 0.25,
-          filter: 'blur(2.5px) brightness(0.42)',
+          opacity: isLight ? 0.75 : 0.25,
+          filter: isLight ? 'blur(1.2px) brightness(0.93)' : 'blur(2.5px) brightness(0.42)',
           zIndex: 2,
-          boxShadow: isLight ? '0 6px 16px rgba(0, 0, 0, 0.05)' : '0 10px 25px rgba(0, 0, 0, 0.5)',
-          border: isLight ? '1px solid rgba(15, 23, 42, 0.08)' : '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: isLight ? '0 10px 24px -6px rgba(15, 23, 42, 0.1), 0 0 1px rgba(15, 23, 42, 0.06)' : '0 10px 25px rgba(0, 0, 0, 0.5)',
+          border: isLight ? '1px solid rgba(203, 213, 225, 0.85)' : '1px solid rgba(255, 255, 255, 0.08)',
         };
       case 2: // Far Right Card: Smaller, darker, steeper rotation (realistic depth effect)
         return {
@@ -254,11 +254,11 @@ export default function Login() {
           z: -100,
           rotateY: -62,
           scale: isMobile ? 0.58 : 0.66,
-          opacity: isLight ? 0.35 : 0.25,
-          filter: 'blur(2.5px) brightness(0.42)',
+          opacity: isLight ? 0.75 : 0.25,
+          filter: isLight ? 'blur(1.2px) brightness(0.93)' : 'blur(2.5px) brightness(0.42)',
           zIndex: 2,
-          boxShadow: isLight ? '0 6px 16px rgba(0, 0, 0, 0.05)' : '0 10px 25px rgba(0, 0, 0, 0.5)',
-          border: isLight ? '1px solid rgba(15, 23, 42, 0.08)' : '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: isLight ? '0 10px 24px -6px rgba(15, 23, 42, 0.1), 0 0 1px rgba(15, 23, 42, 0.06)' : '0 10px 25px rgba(0, 0, 0, 0.5)',
+          border: isLight ? '1px solid rgba(203, 213, 225, 0.85)' : '1px solid rgba(255, 255, 255, 0.08)',
         };
       default:
         return { x: 0, y: 0, z: 0, rotateY: 0, scale: 1, opacity: 1, filter: 'none', zIndex: 1 };
@@ -280,11 +280,11 @@ export default function Login() {
             maxWidth: '460px', 
             borderRadius: '24px', 
             position: 'relative', 
-            background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(12, 19, 35, 0.92)',
+            background: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(12, 19, 35, 0.92)',
             backdropFilter: 'blur(32px)',
             WebkitBackdropFilter: 'blur(32px)',
-            border: `1px solid ${currentRole.color}50`, 
-            boxShadow: isLight ? `0 20px 50px -10px ${currentRole.color}30, 0 10px 30px rgba(0, 0, 0, 0.1)` : `0 24px 60px -15px ${currentRole.color}40, 0 10px 40px rgba(0, 0, 0, 0.7)`,
+            border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : `1px solid ${currentRole.color}50`, 
+            boxShadow: isLight ? '0 25px 60px -15px rgba(15, 23, 42, 0.16)' : `0 24px 60px -15px ${currentRole.color}40, 0 10px 40px rgba(0, 0, 0, 0.7)`,
             overflow: 'hidden'
           }}
         >
@@ -293,13 +293,13 @@ export default function Login() {
             <img 
               src={currentRole.image} 
               alt={currentRole.label}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.75) contrast(1.1)' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.85) contrast(1.05)' }}
             />
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: isLight ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%)' : 'linear-gradient(to bottom, rgba(12, 19, 35, 0.2) 0%, rgba(12, 19, 35, 0.95) 100%)' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: isLight ? 'linear-gradient(to bottom, transparent 40%, rgba(255, 255, 255, 0.9) 100%)' : 'linear-gradient(to bottom, rgba(12, 19, 35, 0.2) 0%, rgba(12, 19, 35, 0.95) 100%)' }} />
             
             <button 
               onClick={() => navigate('/login')} 
-              style={{ position: 'absolute', top: '1rem', left: '1rem', background: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.8)', border: isLight ? '1px solid rgba(15, 23, 42, 0.15)' : '1px solid rgba(255, 255, 255, 0.15)', color: isLight ? '#0f172a' : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', fontWeight: 600, padding: '0.4rem 0.85rem', borderRadius: '999px', backdropFilter: 'blur(12px)' }} 
+              style={{ position: 'absolute', top: '1rem', left: '1rem', background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.15)', color: isLight ? '#0f172a' : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', fontWeight: 600, padding: '0.4rem 0.85rem', borderRadius: '999px', boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.06)' : 'none' }} 
               className="hover-lift"
             >
               &larr; Switch Department
@@ -308,11 +308,11 @@ export default function Login() {
 
           <div style={{ padding: '1.2rem 2.2rem 2.4rem 2.2rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.8rem' }}>
-              <div style={{ width: '62px', height: '62px', borderRadius: '16px', background: currentRole.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', marginTop: '-32px', boxShadow: `0 8px 26px ${currentRole.color}50`, border: '2px solid rgba(255, 255, 255, 0.3)', position: 'relative', zIndex: 2 }}>
+              <div style={{ width: '62px', height: '62px', borderRadius: '16px', background: currentRole.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', marginTop: '-32px', boxShadow: `0 8px 26px ${currentRole.color}50`, border: '2px solid rgba(255, 255, 255, 0.4)', position: 'relative', zIndex: 2 }}>
                 <Icon size={32} color="#fff" />
               </div>
               <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '0.35rem', textAlign: 'center', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.3px' }}>{currentRole.label}</h1>
-              <p style={{ color: isLight ? '#64748b' : '#94a3b8', textAlign: 'center', fontSize: '0.88rem' }}>Authenticate to launch your specialized autonomous workspace</p>
+              <p style={{ color: isLight ? '#475569' : '#94a3b8', textAlign: 'center', fontSize: '0.88rem' }}>Authenticate to launch your specialized autonomous workspace</p>
             </div>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
@@ -326,14 +326,14 @@ export default function Login() {
                     onChange={e => setEmail(e.target.value)}
                     required
                     placeholder={currentRole.email}
-                    style={{ width: '100%', background: isLight ? 'rgba(241, 245, 249, 0.85)' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(15, 23, 42, 0.15)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 1rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem' }}
+                    style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 1rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}
                   />
                 </div>
               </div>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
                   <label style={{ fontSize: '0.86rem', fontWeight: '600', color: isLight ? '#334155' : '#e2e8f0' }}>Password</label>
-                  <span style={{ fontSize: '0.78rem', color: currentRole.color, fontWeight: 600 }}>Default: password123</span>
+                  <span style={{ fontSize: '0.78rem', color: currentRole.color, fontWeight: 700 }}>Default: password123</span>
                 </div>
                 <div style={{ position: 'relative' }}>
                   <Lock size={17} color={isLight ? '#94a3b8' : '#64748b'} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
@@ -343,14 +343,14 @@ export default function Login() {
                     onChange={e => setPassword(e.target.value)}
                     required
                     placeholder="••••••••"
-                    style={{ width: '100%', background: isLight ? 'rgba(241, 245, 249, 0.85)' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(15, 23, 42, 0.15)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 1rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem' }}
+                    style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 1rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}
                   />
                 </div>
               </div>
 
               {/* Quick Demo Fill Helper */}
-              <div style={{ padding: '0.8rem 1rem', background: isLight ? 'rgba(15, 23, 42, 0.03)' : 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: isLight ? '1px dashed rgba(15, 23, 42, 0.15)' : '1px dashed rgba(255, 255, 255, 0.12)', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: isLight ? '#64748b' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <div style={{ padding: '0.8rem 1rem', background: isLight ? 'rgba(241, 245, 249, 0.8)' : 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: isLight ? '1px dashed rgba(203, 213, 225, 0.9)' : '1px dashed rgba(255, 255, 255, 0.12)', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: isLight ? '#475569' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                   <KeyRound size={15} color={currentRole.color} /> Demo: <strong style={{ color: isLight ? '#0f172a' : '#fff' }}>{currentRole.email}</strong>
                 </span>
                 <button
@@ -430,8 +430,8 @@ export default function Login() {
           height: '460px',
           borderRadius: '24px',
           background: isCenter 
-            ? (isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(14, 22, 42, 0.94)')
-            : (isLight ? 'rgba(255, 255, 255, 0.80)' : 'rgba(11, 18, 36, 0.88)'),
+            ? (isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(14, 22, 42, 0.94)')
+            : (isLight ? 'rgba(255, 255, 255, 0.92)' : 'rgba(11, 18, 36, 0.88)'),
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
           border: style.border,
@@ -456,22 +456,34 @@ export default function Login() {
             <img 
               src={role.image} 
               alt={role.label} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.85) contrast(1.1)' }} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: isLight ? 'brightness(0.96) contrast(1.04)' : 'brightness(0.92) contrast(1.08)' }} 
             />
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: isLight ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.3) 70%, rgba(255, 255, 255, 0.85) 100%)' : 'linear-gradient(to bottom, rgba(14, 22, 42, 0.05) 0%, rgba(14, 22, 42, 0.4) 70%, rgba(14, 22, 42, 0.85) 100%)' }} />
+            <div style={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              width: '100%', 
+              height: '100%', 
+              background: isLight 
+                ? 'linear-gradient(to bottom, transparent 65%, rgba(255, 255, 255, 0.8) 100%)' 
+                : 'linear-gradient(to bottom, rgba(14, 22, 42, 0.05) 0%, rgba(14, 22, 42, 0.4) 70%, rgba(14, 22, 42, 0.85) 100%)' 
+            }} />
 
             {/* Over-image Pill Badge */}
             <div style={{ position: 'absolute', top: '0.8rem', right: '0.8rem' }}>
               <span style={{ 
                 fontSize: '0.7rem', 
-                color: '#ffffff', 
-                background: isCenter ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(99, 102, 241, 0.95))' : 'rgba(15, 23, 42, 0.85)', 
-                border: `1px solid ${role.color}75`, 
-                padding: '0.2rem 0.6rem', 
+                color: isCenter ? '#ffffff' : (isLight ? role.color : '#ffffff'), 
+                background: isCenter 
+                  ? 'linear-gradient(135deg, #2563eb, #3b82f6)' 
+                  : (isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.85)'), 
+                border: isCenter ? 'none' : (isLight ? '1px solid rgba(203, 213, 225, 0.95)' : `1px solid ${role.color}75`), 
+                padding: '0.22rem 0.65rem', 
                 borderRadius: '999px', 
                 fontWeight: 700, 
                 textTransform: 'uppercase', 
                 letterSpacing: '0.5px',
+                boxShadow: isLight ? '0 2px 8px rgba(15, 23, 42, 0.06)' : '0 4px 12px rgba(0,0,0,0.4)',
                 backdropFilter: 'blur(10px)'
               }}>
                 {role.badge}
@@ -482,6 +494,9 @@ export default function Login() {
 
         {/* Card Content (Matching reference screenshot centered layout) */}
         <div style={{ padding: '1.2rem 1.4rem 1.6rem 1.4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', flex: 1 }}>
+          <span style={{ fontSize: '0.72rem', color: role.color, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '0.25rem' }}>
+            {role.tagline}
+          </span>
           <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: isLight ? '#0f172a' : '#ffffff', marginBottom: '0.35rem', letterSpacing: '-0.3px' }}>
             {role.label}
           </h3>
@@ -504,16 +519,18 @@ export default function Login() {
                 padding: '0.65rem 2.2rem',
                 borderRadius: '999px', // Pill button exactly like reference screenshot
                 border: isCenter 
-                  ? (isLight ? '1.5px solid rgba(37, 99, 235, 0.85)' : '1.5px solid rgba(59, 130, 246, 0.8)')
-                  : (isLight ? '1px solid rgba(15, 23, 42, 0.15)' : '1px solid rgba(255, 255, 255, 0.2)'),
+                  ? 'none' 
+                  : (isLight ? '1px solid rgba(203, 213, 225, 0.95)' : '1px solid rgba(255, 255, 255, 0.2)'),
                 background: isCenter 
-                  ? (isLight ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : 'rgba(59, 130, 246, 0.2)')
-                  : (isLight ? 'rgba(15, 23, 42, 0.05)' : 'rgba(255, 255, 255, 0.05)'),
-                color: '#ffffff',
+                  ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' 
+                  : (isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.05)'),
+                color: isCenter ? '#ffffff' : (isLight ? '#0f172a' : '#ffffff'),
                 fontSize: '0.9rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: isCenter ? (isLight ? '0 6px 20px rgba(37, 99, 235, 0.35)' : '0 0 25px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)') : 'none',
+                boxShadow: isCenter 
+                  ? '0 6px 20px rgba(37, 99, 235, 0.4)' 
+                  : (isLight ? '0 2px 6px rgba(15, 23, 42, 0.05)' : 'none'),
                 backdropFilter: 'blur(10px)',
                 transition: 'all 0.2s ease',
               }}
@@ -558,13 +575,13 @@ export default function Login() {
             gap: '0.5rem', 
             padding: '0.35rem 1rem', 
             borderRadius: '999px', 
-            background: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.8)', 
-            border: isLight ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(59, 130, 246, 0.35)', 
-            color: isLight ? '#1e293b' : '#e2e8f0', 
+            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', 
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(59, 130, 246, 0.35)', 
+            color: isLight ? '#0f172a' : '#e2e8f0', 
             fontSize: '0.8rem', 
             fontWeight: 600, 
             letterSpacing: '0.3px', 
-            boxShadow: isLight ? '0 4px 14px rgba(0, 0, 0, 0.05)' : '0 6px 20px rgba(59, 130, 246, 0.2)',
+            boxShadow: isLight ? '0 4px 14px rgba(15, 23, 42, 0.06)' : '0 6px 20px rgba(59, 130, 246, 0.2)',
             backdropFilter: 'blur(16px)'
           }}>
             <Cpu size={14} color="#3b82f6" />
@@ -574,26 +591,36 @@ export default function Login() {
           </div>
 
           {/* Theme Selector: Dark and Light Option */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', background: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.8)', border: isLight ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '999px', padding: '0.2rem', backdropFilter: 'blur(16px)' }}>
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', 
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.12)', 
+            borderRadius: '999px', 
+            padding: '0.2rem', 
+            backdropFilter: 'blur(16px)', 
+            boxShadow: isLight ? '0 4px 14px rgba(15, 23, 42, 0.06)' : 'none' 
+          }}>
             <button
               onClick={() => setTheme('dark')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                padding: '0.3rem 0.75rem',
+                padding: '0.32rem 0.8rem',
                 borderRadius: '999px',
                 border: 'none',
-                background: !isLight ? 'rgba(99, 102, 241, 0.3)' : 'transparent',
-                color: !isLight ? '#c7d2fe' : '#64748b',
+                background: !isLight ? 'linear-gradient(135deg, #4f46e5, #6366f1)' : 'transparent',
+                color: !isLight ? '#ffffff' : '#64748b',
                 fontSize: '0.76rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                boxShadow: !isLight ? '0 2px 8px rgba(99, 102, 241, 0.4)' : 'none',
                 transition: 'all 0.2s ease',
               }}
               title="Select Dark Theme"
             >
-              <Moon size={12} color={!isLight ? '#818cf8' : '#94a3b8'} />
+              <Moon size={12} color={!isLight ? '#ffffff' : '#94a3b8'} />
               Dark
             </button>
             <button
@@ -602,44 +629,55 @@ export default function Login() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                padding: '0.3rem 0.75rem',
+                padding: '0.32rem 0.8rem',
                 borderRadius: '999px',
                 border: 'none',
-                background: isLight ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-                color: isLight ? '#1d4ed8' : '#64748b',
+                background: isLight ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'transparent',
+                color: isLight ? '#ffffff' : '#64748b',
                 fontSize: '0.76rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                boxShadow: isLight ? '0 2px 8px rgba(37, 99, 235, 0.35)' : 'none',
                 transition: 'all 0.2s ease',
               }}
               title="Select Light Theme"
             >
-              <Sun size={12} color={isLight ? '#eab308' : '#94a3b8'} />
+              <Sun size={12} color={isLight ? '#ffffff' : '#94a3b8'} />
               Light
             </button>
           </div>
 
           {/* Speed Mode Selector */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', background: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.8)', border: isLight ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '999px', padding: '0.2rem', backdropFilter: 'blur(16px)' }}>
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', 
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.12)', 
+            borderRadius: '999px', 
+            padding: '0.2rem', 
+            backdropFilter: 'blur(16px)', 
+            boxShadow: isLight ? '0 4px 14px rgba(15, 23, 42, 0.06)' : 'none' 
+          }}>
             <button
               onClick={() => setSpeedMode('fast')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                padding: '0.3rem 0.75rem',
+                padding: '0.32rem 0.8rem',
                 borderRadius: '999px',
                 border: 'none',
-                background: speedMode === 'fast' ? 'rgba(16, 185, 129, 0.25)' : 'transparent',
-                color: speedMode === 'fast' ? (isLight ? '#047857' : '#34d399') : '#64748b',
+                background: speedMode === 'fast' ? 'linear-gradient(135deg, #10b981, #059669)' : 'transparent',
+                color: speedMode === 'fast' ? '#ffffff' : (isLight ? '#64748b' : '#94a3b8'),
                 fontSize: '0.76rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                boxShadow: speedMode === 'fast' ? '0 2px 8px rgba(16, 185, 129, 0.35)' : 'none',
                 transition: 'all 0.2s ease',
               }}
               title="Rotate cards quickly (1.5s)"
             >
-              <Zap size={11} color={speedMode === 'fast' ? '#10b981' : '#94a3b8'} />
+              <Zap size={11} color={speedMode === 'fast' ? '#ffffff' : '#94a3b8'} />
               Fast (1.5s)
             </button>
             <button
@@ -648,14 +686,15 @@ export default function Login() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                padding: '0.3rem 0.75rem',
+                padding: '0.32rem 0.8rem',
                 borderRadius: '999px',
                 border: 'none',
-                background: speedMode === 'normal' ? 'rgba(59, 130, 246, 0.25)' : 'transparent',
-                color: speedMode === 'normal' ? (isLight ? '#1d4ed8' : '#93c5fd') : '#64748b',
+                background: speedMode === 'normal' ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'transparent',
+                color: speedMode === 'normal' ? '#ffffff' : (isLight ? '#64748b' : '#94a3b8'),
                 fontSize: '0.76rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                boxShadow: speedMode === 'normal' ? '0 2px 8px rgba(37, 99, 235, 0.35)' : 'none',
                 transition: 'all 0.2s ease',
               }}
               title="Rotate cards at standard pace (3s)"
@@ -672,7 +711,7 @@ export default function Login() {
           marginBottom: '0.35rem', 
           letterSpacing: '-0.7px', 
           background: isLight 
-            ? 'linear-gradient(135deg, #0f172a 40%, #1e293b 75%, #334155 100%)' 
+            ? 'linear-gradient(135deg, #0f172a 35%, #1e293b 65%, #2563eb 100%)' 
             : 'linear-gradient(135deg, #ffffff 40%, #e2e8f0 75%, #94a3b8 100%)', 
           WebkitBackgroundClip: 'text', 
           WebkitTextFillColor: 'transparent',
@@ -680,7 +719,7 @@ export default function Login() {
         }}>
           ResolveX Enterprise
         </h1>
-        <p style={{ color: isLight ? '#475569' : '#94a3b8', fontSize: '1rem', margin: '0 auto', lineHeight: 1.4, maxWidth: '600px' }}>
+        <p style={{ color: isLight ? '#334155' : '#94a3b8', fontSize: '1rem', margin: '0 auto', lineHeight: 1.4, maxWidth: '600px', fontWeight: 500 }}>
           Select your department portal below to access your specialized autonomous AI agents
         </p>
       </div>
@@ -714,15 +753,15 @@ export default function Login() {
             width: '46px',
             height: '46px',
             borderRadius: '50%',
-            border: isLight ? '1px solid rgba(15, 23, 42, 0.15)' : '1px solid rgba(255, 255, 255, 0.2)',
-            background: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.75)',
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.2)',
+            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.75)',
             color: isLight ? '#0f172a' : '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             backdropFilter: 'blur(16px)',
-            boxShadow: isLight ? '0 6px 18px rgba(0, 0, 0, 0.1)' : '0 8px 24px rgba(0, 0, 0, 0.5)',
+            boxShadow: isLight ? '0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.05)' : '0 8px 24px rgba(0, 0, 0, 0.5)',
             transition: 'all 0.2s ease',
           }}
           className="hover-lift"
@@ -746,15 +785,15 @@ export default function Login() {
             width: '46px',
             height: '46px',
             borderRadius: '50%',
-            border: isLight ? '1px solid rgba(15, 23, 42, 0.15)' : '1px solid rgba(255, 255, 255, 0.2)',
-            background: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.75)',
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.2)',
+            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.75)',
             color: isLight ? '#0f172a' : '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             backdropFilter: 'blur(16px)',
-            boxShadow: isLight ? '0 6px 18px rgba(0, 0, 0, 0.1)' : '0 8px 24px rgba(0, 0, 0, 0.5)',
+            boxShadow: isLight ? '0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.05)' : '0 8px 24px rgba(0, 0, 0, 0.5)',
             transition: 'all 0.2s ease',
           }}
           className="hover-lift"
@@ -781,10 +820,10 @@ export default function Login() {
                 borderRadius: '50%',
                 border: 'none',
                 background: isActive 
-                  ? (isLight ? '#2563eb' : '#38bdf8') 
-                  : (isLight ? 'rgba(15, 23, 42, 0.2)' : 'rgba(255, 255, 255, 0.22)'),
+                  ? '#2563eb' 
+                  : (isLight ? 'rgba(15, 23, 42, 0.22)' : 'rgba(255, 255, 255, 0.22)'),
                 boxShadow: isActive 
-                  ? (isLight ? '0 0 14px #2563eb, 0 0 4px #2563eb' : '0 0 14px #38bdf8, 0 0 4px #38bdf8') 
+                  ? (isLight ? '0 0 14px rgba(37, 99, 235, 0.7), 0 0 4px #2563eb' : '0 0 14px #38bdf8, 0 0 4px #38bdf8') 
                   : 'none',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
@@ -805,18 +844,20 @@ export default function Login() {
             display: 'flex',
             alignItems: 'center',
             gap: '0.35rem',
-            padding: '0.2rem 0.65rem',
+            padding: '0.25rem 0.75rem',
             borderRadius: '999px',
-            border: isLight ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(255, 255, 255, 0.1)',
-            background: isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(15, 23, 42, 0.65)',
-            color: isPaused ? '#f59e0b' : (isLight ? '#059669' : '#34d399'),
-            fontSize: '0.72rem',
-            fontWeight: 600,
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.1)',
+            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.65)',
+            color: isPaused ? '#d97706' : (isLight ? '#059669' : '#34d399'),
+            fontSize: '0.74rem',
+            fontWeight: 700,
             cursor: 'pointer',
             backdropFilter: 'blur(12px)',
+            boxShadow: isLight ? '0 2px 8px rgba(15, 23, 42, 0.05)' : 'none',
+            transition: 'all 0.2s ease',
           }}
         >
-          {isPaused ? <Play size={10} color="#f59e0b" /> : <Pause size={10} color={isLight ? '#059669' : '#34d399'} />}
+          {isPaused ? <Play size={10} color="#d97706" /> : <Pause size={10} color={isLight ? '#059669' : '#34d399'} />}
           {isPaused ? 'Auto-Slide Paused' : `Auto-Rotating Fast (${autoSlideInterval / 1000}s)`}
         </button>
       </div>

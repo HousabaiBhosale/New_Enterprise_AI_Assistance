@@ -45,3 +45,43 @@
   --transition-fast: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --transition-normal: 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* Premium Light Theme Variables */
+[data-theme="light"] {
+  /* Brand Core Colors */
+  --primary-color: #2563eb;       /* Royal Blue */
+  --primary-hover: #1d4ed8;
+  --secondary-color: #7c3aed;     /* Royal Violet */
+
+  /* Realistic Departmental Accent Palette (High Contrast for Light Mode) */
+  --color-hr: #9333ea;            /* Purple */
+  --color-sales: #059669;         /* Emerald */
+  --color-support: #0284c7;       /* Blue */
+  --color-admin: #4f46e5;         /* Indigo */
+  --color-coral: #e11d48;         /* Rose */
+  --color-amber: #d97706;         /* Amber */
+
+  /* Luminous Daylight Backgrounds */
+  --bg-darker: #f8fafc;           /* Light Slate White */
+  --bg-dark: #f1f5f9;             /* Crisp Cool White */
+  --bg-card: rgba(255, 255, 255, 0.94);
+  --bg-card-hover: rgba(255, 255, 255, 0.98);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+
+  /* Typography Colors */
+  --text-main: #0f172a;           /* Deep Slate 900 */
+  --text-sub: #334155;            /* Slate 700 */
+  --text-muted: #64748b;          /* Slate 500 */
+
+  /* Light Glassmorphic Borders & Highlights */
+  --border-color: rgba(203, 213, 225, 0.85);
+  --border-bright: rgba(148, 163, 184, 0.85);
+  --glass-border: rgba(226, 232, 240, 0.9);
+
+  /* Clean Multi-Layered Elevation Shadows */
+  --panel-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05);
+  --glow-indigo: 0 0 25px rgba(37, 99, 235, 0.22);
+  --glow-emerald: 0 0 25px rgba(5, 150, 105, 0.22);
+  --glow-violet: 0 0 25px rgba(147, 51, 234, 0.22);
+  --glow-azure: 0 0 25px rgba(2, 132, 199, 0.22);
+}
