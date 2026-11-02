@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Login() {
   const { roleId } = useParams();
@@ -14,22 +15,10 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, isLoading } = useAuth();
-
-  // Theme selection: 'dark' or 'light'
-  const [theme, setTheme] = useState(() => {
-    return (typeof localStorage !== 'undefined' && localStorage.getItem('enterprise_theme')) || 'dark';
-  });
+  const { theme, setTheme, isLight } = useTheme();
 
   // Speed selection: 'fast' (1500ms) or 'normal' (3000ms)
   const [speedMode, setSpeedMode] = useState('fast');
-
-  // Synchronize theme to document root attribute
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('enterprise_theme', theme);
-  }, [theme]);
-
-  const isLight = theme === 'light';
 
   // All 5 cards in circular order: Employee, HR, System Admin (center initial), Sales, Support
   const allRoles = [

@@ -1,6 +1,9 @@
 import { Users, CreditCard, MessageSquare, Briefcase, TrendingUp } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function StatsGrid() {
+  const { isLight } = useTheme();
+
   const stats = [
     { 
       label: 'Completed Sales Revenue', 
@@ -10,8 +13,7 @@ export default function StatsGrid() {
       icon: CreditCard, 
       color: '#10b981',
       gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-      accentBg: 'rgba(16, 185, 129, 0.12)',
-      cardBg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(19, 29, 53, 0.75) 100%)'
+      accentBg: isLight ? 'rgba(16, 185, 129, 0.14)' : 'rgba(16, 185, 129, 0.12)',
     },
     { 
       label: 'Active Workforce Roster', 
@@ -21,8 +23,7 @@ export default function StatsGrid() {
       icon: Users, 
       color: '#a855f7',
       gradient: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
-      accentBg: 'rgba(168, 85, 247, 0.12)',
-      cardBg: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(19, 29, 53, 0.75) 100%)'
+      accentBg: isLight ? 'rgba(168, 85, 247, 0.14)' : 'rgba(168, 85, 247, 0.12)',
     },
     { 
       label: 'Resolved Helpdesk Requests', 
@@ -32,8 +33,7 @@ export default function StatsGrid() {
       icon: Briefcase, 
       color: '#0ea5e9',
       gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
-      accentBg: 'rgba(14, 165, 233, 0.12)',
-      cardBg: 'linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(19, 29, 53, 0.75) 100%)'
+      accentBg: isLight ? 'rgba(14, 165, 233, 0.14)' : 'rgba(14, 165, 233, 0.12)',
     },
     { 
       label: 'Autonomous Agent Tasks', 
@@ -43,8 +43,7 @@ export default function StatsGrid() {
       icon: MessageSquare, 
       color: '#f59e0b',
       gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
-      accentBg: 'rgba(245, 158, 11, 0.12)',
-      cardBg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(19, 29, 53, 0.75) 100%)'
+      accentBg: isLight ? 'rgba(245, 158, 11, 0.14)' : 'rgba(245, 158, 11, 0.12)',
     },
   ];
 
@@ -57,24 +56,27 @@ export default function StatsGrid() {
             key={i} 
             className="glass-panel hover-lift" 
             style={{ 
-              background: stat.cardBg, 
-              border: `1px solid ${stat.color}35`, 
+              background: isLight 
+                ? `linear-gradient(135deg, ${stat.color}08 0%, rgba(255, 255, 255, 0.98) 100%)` 
+                : `linear-gradient(135deg, ${stat.color}12 0%, rgba(19, 29, 53, 0.75) 100%)`, 
+              border: isLight ? `1px solid ${stat.color}35` : `1px solid ${stat.color}35`, 
               borderRadius: 'var(--radius-lg)', 
               padding: '1.5rem', 
               display: 'flex', 
               flexDirection: 'column', 
               gap: '1.1rem',
-              boxShadow: `0 12px 28px -5px ${stat.color}20`,
+              boxShadow: isLight ? `0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 0 1px ${stat.color}30` : `0 12px 28px -5px ${stat.color}20`,
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = `${stat.color}80`;
-              e.currentTarget.style.boxShadow = `0 18px 36px -8px ${stat.color}35`;
+              e.currentTarget.style.boxShadow = isLight ? `0 14px 30px -5px rgba(15, 23, 42, 0.1), 0 0 1px ${stat.color}` : `0 18px 36px -8px ${stat.color}35`;
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = `${stat.color}35`;
-              e.currentTarget.style.boxShadow = `0 12px 28px -5px ${stat.color}20`;
+              e.currentTarget.style.boxShadow = isLight ? `0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 0 1px ${stat.color}30` : `0 12px 28px -5px ${stat.color}20`;
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -86,8 +88,8 @@ export default function StatsGrid() {
               </span>
             </div>
             <div>
-              <p style={{ color: 'var(--text-sub)', fontSize: '0.88rem', marginBottom: '0.25rem', fontWeight: 600 }}>{stat.label}</p>
-              <h3 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#fff' }}>{stat.value}</h3>
+              <p style={{ color: isLight ? '#475569' : 'var(--text-sub)', fontSize: '0.88rem', marginBottom: '0.25rem', fontWeight: 600 }}>{stat.label}</p>
+              <h3 style={{ fontSize: '1.85rem', fontWeight: '800', color: isLight ? '#0f172a' : '#fff' }}>{stat.value}</h3>
             </div>
           </div>
         );

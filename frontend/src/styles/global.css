@@ -155,6 +155,50 @@ ul {
     background: var(--primary-color);
 }
 
+/* Light Theme Specific Components and Elements */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+    color: var(--text-main);
+    background-color: #ffffff;
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+    color: #94a3b8;
+}
+
+[data-theme="light"] .card-sales {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="light"] .card-hr {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+[data-theme="light"] .card-support {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border: 1px solid rgba(14, 165, 233, 0.35);
+}
+
+[data-theme="light"] table th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    border-color: rgba(226, 232, 240, 0.9);
+}
+
+[data-theme="light"] table td {
+    border-color: rgba(226, 232, 240, 0.9);
+    color: #334155;
+}
+
+[data-theme="light"] table tr:hover {
+    background-color: rgba(241, 245, 249, 0.6);
+}
+
 /* Realistic Pulsing Live Beacon */
 .status-beacon {
     position: relative;

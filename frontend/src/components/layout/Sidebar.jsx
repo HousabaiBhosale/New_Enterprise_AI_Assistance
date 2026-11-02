@@ -5,10 +5,12 @@ import {
   Zap, Lock, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Sidebar() {
   const location = useLocation();
   const { user } = useAuth();
+  const { isLight } = useTheme();
   const role = (user?.role || 'admin').toLowerCase();
 
   const getMenuItems = () => {
@@ -86,28 +88,29 @@ export default function Sidebar() {
         margin: '1rem 0 1rem 1rem', 
         display: 'flex', 
         flexDirection: 'column', 
-        background: 'rgba(19, 29, 53, 0.75)',
-        border: '1px solid var(--border-color)', 
-        boxShadow: '0 20px 45px -10px rgba(0, 0, 0, 0.4)', 
-        zIndex: 10 
+        background: isLight ? 'rgba(255, 255, 255, 0.92)' : 'rgba(19, 29, 53, 0.75)',
+        border: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', 
+        boxShadow: isLight ? '0 20px 45px -10px rgba(15, 23, 42, 0.08)' : '0 20px 45px -10px rgba(0, 0, 0, 0.4)', 
+        zIndex: 10,
+        transition: 'all 0.3s ease'
       }}
     >
       {/* Brand Header */}
-      <div style={{ padding: '1.75rem 1.4rem', display: 'flex', alignItems: 'center', gap: '0.9rem', borderBottom: '1px solid var(--border-color)' }}>
+      <div style={{ padding: '1.75rem 1.4rem', display: 'flex', alignItems: 'center', gap: '0.9rem', borderBottom: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)' }}>
         <div style={{ position: 'relative' }}>
           <div style={{ width: '44px', height: '44px', borderRadius: '13px', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #06b6d4 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(99, 102, 241, 0.45)', border: '1.5px solid rgba(255, 255, 255, 0.25)' }}>
             <Zap size={23} color="#fff" />
           </div>
-          <span className="status-beacon" style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '9px', height: '9px', borderRadius: '50%', background: '#10b981', border: '2px solid #0f172a' }}></span>
+          <span className="status-beacon" style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '9px', height: '9px', borderRadius: '50%', background: '#10b981', border: isLight ? '2px solid #ffffff' : '2px solid #0f172a' }}></span>
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-            <h1 style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '0.4px', color: '#fff', margin: 0 }}>ResolveX</h1>
-            <span style={{ fontSize: '0.65rem', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%)', color: '#c084fc', padding: '0.12rem 0.45rem', borderRadius: '4px', fontWeight: 800, border: '1px solid rgba(168, 85, 247, 0.4)' }}>
+            <h1 style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '0.4px', color: isLight ? '#0f172a' : '#fff', margin: 0 }}>ResolveX</h1>
+            <span style={{ fontSize: '0.65rem', background: isLight ? 'rgba(99, 102, 241, 0.12)' : 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%)', color: isLight ? '#4f46e5' : '#c084fc', padding: '0.12rem 0.45rem', borderRadius: '4px', fontWeight: 800, border: isLight ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid rgba(168, 85, 247, 0.4)' }}>
               v2.5
             </span>
           </div>
-          <span style={{ fontSize: '0.74rem', color: 'var(--text-sub)', textTransform: 'capitalize', display: 'block', marginTop: '0.15rem' }}>
+          <span style={{ fontSize: '0.74rem', color: isLight ? '#475569' : 'var(--text-sub)', textTransform: 'capitalize', display: 'block', marginTop: '0.15rem' }}>
             {role === 'admin' ? 'Enterprise Multi-Agent' : `${role} Workspace`}
           </span>
         </div>
@@ -131,10 +134,12 @@ export default function Sidebar() {
                     gap: '0.85rem', 
                     padding: '0.75rem 0.95rem',
                     borderRadius: 'var(--radius-md)',
-                    color: isActive ? '#fff' : 'var(--text-sub)',
-                    background: isActive ? `linear-gradient(90deg, ${itemColor}25 0%, ${itemColor}10 100%)` : 'transparent',
-                    border: isActive ? `1px solid ${itemColor}50` : '1px solid transparent',
-                    boxShadow: isActive ? `0 4px 15px ${itemColor}20` : 'none',
+                    color: isActive ? (isLight ? '#0f172a' : '#fff') : (isLight ? '#334155' : 'var(--text-sub)'),
+                    background: isActive 
+                      ? (isLight ? `linear-gradient(90deg, ${itemColor}15 0%, ${itemColor}06 100%)` : `linear-gradient(90deg, ${itemColor}25 0%, ${itemColor}10 100%)`) 
+                      : 'transparent',
+                    border: isActive ? `1px solid ${itemColor}45` : '1px solid transparent',
+                    boxShadow: isActive ? (isLight ? `0 2px 10px ${itemColor}15` : `0 4px 15px ${itemColor}20`) : 'none',
                     transition: 'all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
                     position: 'relative'
                   }}
@@ -143,10 +148,10 @@ export default function Sidebar() {
                   {isActive && (
                     <span style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: '3.5px', background: itemColor, borderRadius: '0 4px 4px 0', boxShadow: `0 0 10px ${itemColor}` }}></span>
                   )}
-                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: isActive ? `${itemColor}30` : `${itemColor}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${isActive ? itemColor : itemColor + '30'}` }}>
-                    <Icon size={16} style={{ color: isActive ? '#fff' : itemColor }} />
+                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: isActive ? `${itemColor}25` : (isLight ? `${itemColor}12` : `${itemColor}15`), display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${isActive ? itemColor : itemColor + '30'}` }}>
+                    <Icon size={16} style={{ color: isActive ? (isLight ? itemColor : '#fff') : itemColor }} />
                   </div>
-                  <span style={{ fontWeight: isActive ? '700' : '500', fontSize: '0.9rem' }}>{item.label}</span>
+                  <span style={{ fontWeight: isActive ? '700' : '600', fontSize: '0.9rem' }}>{item.label}</span>
                 </Link>
               </li>
             );
@@ -155,10 +160,19 @@ export default function Sidebar() {
       </nav>
 
       {/* Realistic Security & Role Footer */}
-      <div style={{ padding: '1.25rem 1.2rem', borderTop: '1px solid var(--border-color)' }}>
-        <div style={{ padding: '0.85rem 1rem', background: 'rgba(12, 18, 34, 0.7)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div style={{ padding: '1.25rem 1.2rem', borderTop: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)' }}>
+        <div style={{ 
+          padding: '0.85rem 1rem', 
+          background: isLight ? 'rgba(248, 250, 252, 0.95)' : 'rgba(12, 18, 34, 0.7)', 
+          borderRadius: 'var(--radius-md)', 
+          border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid var(--border-color)', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '0.5rem',
+          boxShadow: isLight ? '0 2px 6px rgba(15, 23, 42, 0.04)' : 'none'
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <span style={{ fontSize: '0.74rem', color: isLight ? '#64748b' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <Lock size={12} color="#10b981" /> RBAC Verified
             </span>
             <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>ONLINE</span>
