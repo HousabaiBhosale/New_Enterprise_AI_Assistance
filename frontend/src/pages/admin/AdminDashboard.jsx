@@ -1,7 +1,9 @@
 import { Shield, Settings, Server, Users, ShieldAlert, KeyRound, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function AdminDashboard() {
+  const { isLight } = useTheme();
   const adminModules = [
     {
       title: 'Audit Trail & Logs',
@@ -37,35 +39,69 @@ export default function AdminDashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Visual Header Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(99, 102, 241, 0.22) 50%, rgba(13, 148, 136, 0.18) 100%), url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
+        background: isLight 
+          ? 'linear-gradient(135deg, rgba(254, 242, 242, 0.96) 0%, rgba(238, 242, 255, 0.94) 50%, rgba(240, 253, 250, 0.96) 100%), url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat'
+          : 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(99, 102, 241, 0.22) 50%, rgba(13, 148, 136, 0.18) 100%), url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid rgba(239, 68, 68, 0.35)',
+        border: isLight ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(239, 68, 68, 0.35)',
         padding: '2.2rem 2.5rem',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: 'var(--panel-shadow)',
+        boxShadow: isLight ? '0 16px 40px -10px rgba(15, 23, 42, 0.08)' : 'var(--panel-shadow)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1.5rem'
+        gap: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.82) 60%, rgba(2, 6, 23, 0.5) 100%)', pointerEvents: 'none' }} />
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          background: isLight 
+            ? 'linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.82) 60%, rgba(255, 255, 255, 0.45) 100%)' 
+            : 'linear-gradient(90deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.82) 60%, rgba(2, 6, 23, 0.5) 100%)', 
+          pointerEvents: 'none' 
+        }} />
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '680px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.75rem' }}>
-            <Sparkles size={14} color="#f87171" /> Platform Governance & Zero Trust Security
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '0.45rem', 
+            padding: '0.35rem 0.85rem', 
+            borderRadius: 'var(--radius-full)', 
+            background: isLight ? 'rgba(239, 68, 68, 0.12)' : 'rgba(239, 68, 68, 0.2)', 
+            border: isLight ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(239, 68, 68, 0.4)', 
+            color: isLight ? '#dc2626' : '#f87171', 
+            fontSize: '0.8rem', 
+            fontWeight: 700, 
+            marginBottom: '0.75rem' 
+          }}>
+            <Sparkles size={14} color={isLight ? '#dc2626' : '#f87171'} /> Platform Governance & Zero Trust Security
           </div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: '#fff', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.5px' }}>
             System Administration
           </h1>
-          <p style={{ color: 'var(--text-sub)', fontSize: '0.96rem', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: isLight ? '#475569' : 'var(--text-sub)', fontSize: '0.96rem', lineHeight: 1.6, margin: 0 }}>
             Global platform governance, tamper-evident audit trails, role-based access control (RBAC), and agent microservice orchestration.
           </p>
         </div>
 
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <div style={{ background: 'rgba(2, 6, 23, 0.85)', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '0.6rem 1.1rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#34d399', fontSize: '0.85rem', fontWeight: 700 }}>
+          <div style={{ 
+            background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.85)', 
+            border: isLight ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(16, 185, 129, 0.4)', 
+            padding: '0.6rem 1.1rem', 
+            borderRadius: 'var(--radius-md)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            color: isLight ? '#047857' : '#34d399', 
+            fontSize: '0.85rem', 
+            fontWeight: 700,
+            boxShadow: isLight ? '0 4px 15px rgba(16, 185, 129, 0.12)' : 'none'
+          }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }}></span>
             Cluster: 4 Agents Healthy
           </div>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Users, FileText, Heart, ShieldAlert, ChevronRight, Loader, Sparkles, Send } from 'lucide-react';
 import { hrService } from '../../services/hrService';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function HRDashboard() {
+  const { isLight } = useTheme();
   const [stats, setStats] = useState({
     active_employees: 0,
     pending_leaves: 0,
@@ -89,30 +91,52 @@ export default function HRDashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Visual Header Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.2) 50%, rgba(14, 165, 233, 0.15) 100%), url("https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
+        background: isLight 
+          ? 'linear-gradient(135deg, rgba(245, 243, 255, 0.96) 0%, rgba(250, 245, 255, 0.94) 50%, rgba(238, 242, 255, 0.96) 100%), url("https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat'
+          : 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.2) 50%, rgba(14, 165, 233, 0.15) 100%), url("https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid rgba(168, 85, 247, 0.3)',
+        border: isLight ? '1px solid rgba(168, 85, 247, 0.35)' : '1px solid rgba(168, 85, 247, 0.3)',
         padding: '2.2rem 2.5rem',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: 'var(--panel-shadow)',
+        boxShadow: isLight ? '0 16px 40px -10px rgba(15, 23, 42, 0.08)' : 'var(--panel-shadow)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1.5rem'
+        gap: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
-        {/* Dark gradient overlay for text readability */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.75) 60%, rgba(2, 6, 23, 0.45) 100%)', pointerEvents: 'none' }} />
+        {/* Luminous gradient overlay */}
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          background: isLight 
+            ? 'linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.82) 60%, rgba(255, 255, 255, 0.45) 100%)' 
+            : 'linear-gradient(90deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.75) 60%, rgba(2, 6, 23, 0.45) 100%)', 
+          pointerEvents: 'none' 
+        }} />
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '650px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-full)', background: 'rgba(168, 85, 247, 0.2)', border: '1px solid rgba(168, 85, 247, 0.4)', color: '#c084fc', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.75rem' }}>
-            <Sparkles size={14} color="#c084fc" /> Enterprise Workforce Hub & Sentinel
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '0.45rem', 
+            padding: '0.3rem 0.8rem', 
+            borderRadius: 'var(--radius-full)', 
+            background: isLight ? 'rgba(168, 85, 247, 0.12)' : 'rgba(168, 85, 247, 0.2)', 
+            border: isLight ? '1px solid rgba(168, 85, 247, 0.35)' : '1px solid rgba(168, 85, 247, 0.4)', 
+            color: isLight ? '#9333ea' : '#c084fc', 
+            fontSize: '0.8rem', 
+            fontWeight: 700, 
+            marginBottom: '0.75rem' 
+          }}>
+            <Sparkles size={14} color={isLight ? '#9333ea' : '#c084fc'} /> Enterprise Workforce Hub & Sentinel
           </div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: '#fff', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.5px' }}>
             HR & People Operations
           </h1>
-          <p style={{ color: 'var(--text-sub)', fontSize: '0.98rem', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: isLight ? '#475569' : 'var(--text-sub)', fontSize: '0.98rem', lineHeight: 1.6, margin: 0 }}>
             Automated leave processing, policy compliance verification, workforce census statements, and AI-guided employee assistance.
           </p>
         </div>
@@ -124,12 +148,21 @@ export default function HRDashboard() {
                 key={i}
                 src={h.avatar}
                 alt={h.name}
-                style={{ width: '42px', height: '42px', borderRadius: '50%', border: '2px solid var(--bg-dark)', marginLeft: i > 0 ? '-12px' : '0', objectFit: 'cover' }}
+                style={{ width: '42px', height: '42px', borderRadius: '50%', border: isLight ? '2px solid #ffffff' : '2px solid var(--bg-dark)', marginLeft: i > 0 ? '-12px' : '0', objectFit: 'cover' }}
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             ))}
           </div>
-          <div style={{ padding: '0.5rem 1rem', background: 'rgba(2, 6, 23, 0.8)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-full)', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-main)' }}>
+          <div style={{ 
+            padding: '0.5rem 1rem', 
+            background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.8)', 
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid var(--glass-border)', 
+            borderRadius: 'var(--radius-full)', 
+            fontSize: '0.82rem', 
+            fontWeight: 700, 
+            color: isLight ? '#0f172a' : 'var(--text-main)',
+            boxShadow: isLight ? '0 2px 8px rgba(15, 23, 42, 0.05)' : 'none'
+          }}>
             +25 Active Team Members
           </div>
         </div>
@@ -211,14 +244,16 @@ export default function HRDashboard() {
                 key={i}
                 onClick={() => { setQuery(promptText); handleAskAI(promptText); }}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-muted)',
+                  background: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.04)',
+                  border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)',
+                  color: isLight ? '#0f172a' : 'var(--text-muted)',
                   borderRadius: '16px',
                   padding: '0.35rem 0.8rem',
                   fontSize: '0.8rem',
+                  fontWeight: 600,
                   cursor: 'pointer',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxShadow: isLight ? '0 1px 3px rgba(15, 23, 42, 0.04)' : 'none'
                 }}
                 className="hover-lift"
               >
@@ -375,8 +410,8 @@ export default function HRDashboard() {
                   alt={item.title} 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(2, 6, 23, 0.9) 100%)' }} />
-                <span style={{ position: 'absolute', top: '12px', left: '12px', padding: '0.25rem 0.65rem', borderRadius: '12px', background: 'rgba(2, 6, 23, 0.75)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '0.72rem', fontWeight: 600, color: '#fff', backdropFilter: 'blur(8px)' }}>
+                <div style={{ position: 'absolute', inset: 0, background: isLight ? 'linear-gradient(180deg, transparent 40%, rgba(255, 255, 255, 0.92) 100%)' : 'linear-gradient(180deg, transparent 40%, rgba(2, 6, 23, 0.9) 100%)' }} />
+                <span style={{ position: 'absolute', top: '12px', left: '12px', padding: '0.25rem 0.65rem', borderRadius: '12px', background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.75)', border: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid rgba(255,255,255,0.15)', fontSize: '0.72rem', fontWeight: 600, color: isLight ? '#0f172a' : '#fff', backdropFilter: 'blur(8px)', boxShadow: isLight ? '0 2px 6px rgba(15, 23, 42, 0.06)' : 'none' }}>
                   {item.category}
                 </span>
                 <span style={{ position: 'absolute', bottom: '10px', right: '12px', padding: '0.2rem 0.55rem', borderRadius: '8px', background: 'rgba(99, 102, 241, 0.9)', fontSize: '0.72rem', fontWeight: 700, color: '#fff' }}>

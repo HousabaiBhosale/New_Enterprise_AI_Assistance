@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { FileBarChart, Download, FileSpreadsheet, Plus, RefreshCw, CheckCircle, Sparkles, FileText, BarChart3, TrendingUp, Users, ShieldCheck } from 'lucide-react';
 import { reportService } from '../services/reportService';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Reports() {
+  const { isLight } = useTheme();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -43,29 +45,51 @@ export default function Reports() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Visual Header Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.25) 0%, rgba(99, 102, 241, 0.22) 50%, rgba(16, 185, 129, 0.15) 100%), url("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
+        background: isLight 
+          ? 'linear-gradient(135deg, rgba(255, 241, 242, 0.96) 0%, rgba(255, 245, 245, 0.94) 50%, rgba(240, 253, 250, 0.96) 100%), url("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat'
+          : 'linear-gradient(135deg, rgba(244, 63, 94, 0.25) 0%, rgba(99, 102, 241, 0.22) 50%, rgba(16, 185, 129, 0.15) 100%), url("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid rgba(244, 63, 94, 0.35)',
+        border: isLight ? '1px solid rgba(244, 63, 94, 0.35)' : '1px solid rgba(244, 63, 94, 0.35)',
         padding: '2.2rem 2.5rem',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: 'var(--panel-shadow)',
+        boxShadow: isLight ? '0 16px 40px -10px rgba(15, 23, 42, 0.08)' : 'var(--panel-shadow)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1.5rem'
+        gap: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.82) 60%, rgba(2, 6, 23, 0.5) 100%)', pointerEvents: 'none' }} />
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          background: isLight 
+            ? 'linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.82) 60%, rgba(255, 255, 255, 0.45) 100%)' 
+            : 'linear-gradient(90deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.82) 60%, rgba(2, 6, 23, 0.5) 100%)', 
+          pointerEvents: 'none' 
+        }} />
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '640px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', background: 'rgba(244, 63, 94, 0.2)', border: '1px solid rgba(244, 63, 94, 0.4)', color: '#fb7185', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.75rem' }}>
-            <Sparkles size={14} color="#fb7185" /> Executive BI & Export Engine
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '0.45rem', 
+            padding: '0.35rem 0.85rem', 
+            borderRadius: 'var(--radius-full)', 
+            background: isLight ? 'rgba(244, 63, 94, 0.12)' : 'rgba(244, 63, 94, 0.2)', 
+            border: isLight ? '1px solid rgba(244, 63, 94, 0.35)' : '1px solid rgba(244, 63, 94, 0.4)', 
+            color: isLight ? '#e11d48' : '#fb7185', 
+            fontSize: '0.8rem', 
+            fontWeight: 700, 
+            marginBottom: '0.75rem' 
+          }}>
+            <Sparkles size={14} color={isLight ? '#e11d48' : '#fb7185'} /> Executive BI & Export Engine
           </div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: '#fff', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.5px' }}>
             Enterprise Reports & Exports
           </h1>
-          <p style={{ color: 'var(--text-sub)', fontSize: '0.96rem', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: isLight ? '#475569' : 'var(--text-sub)', fontSize: '0.96rem', lineHeight: 1.6, margin: 0 }}>
             Automated PDF executive briefings and Excel ledger exports compiled on-demand from validated organizational records.
           </p>
         </div>
@@ -151,13 +175,19 @@ export default function Reports() {
           <p>Scanning enterprise reports archive...</p>
         </div>
       ) : reports.length === 0 ? (
-        <div style={{ padding: '4rem', textAlign: 'center', border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-lg)', background: 'rgba(2, 6, 23, 0.2)' }}>
-          <FileBarChart size={48} color="#f43f5e" style={{ margin: '0 auto 1rem', opacity: 0.6 }} />
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#fff' }}>No Reports Generated Yet</h3>
-          <p style={{ color: 'var(--text-sub)', maxWidth: '420px', margin: '0 auto 1.5rem' }}>Click one of the buttons above to generate a new live PDF briefing or Excel summary.</p>
+        <div style={{ 
+          padding: '4rem', 
+          textAlign: 'center', 
+          border: isLight ? '2px dashed rgba(203, 213, 225, 0.9)' : '2px dashed var(--border-color)', 
+          borderRadius: 'var(--radius-lg)', 
+          background: isLight ? 'rgba(241, 245, 249, 0.6)' : 'rgba(2, 6, 23, 0.2)' 
+        }}>
+          <FileBarChart size={48} color="#f43f5e" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
+          <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: isLight ? '#0f172a' : '#fff' }}>No Reports Generated Yet</h3>
+          <p style={{ color: isLight ? '#64748b' : 'var(--text-sub)', maxWidth: '420px', margin: '0 auto 1.5rem' }}>Click one of the buttons above to generate a new live PDF briefing or Excel summary.</p>
           <button
             onClick={() => handleGenerate('sales', 'pdf')}
-            style={{ background: '#f43f5e', color: 'white', border: 'none', padding: '0.7rem 1.4rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: '#f43f5e', color: 'white', border: 'none', padding: '0.7rem 1.4rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 15px rgba(244, 63, 94, 0.3)' }}
           >
             Generate First Sales Report
           </button>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, Clock, FileText, AlertCircle, RefreshCw, Check, Sparkles, ShieldCheck } from 'lucide-react';
 import { approvalService } from '../services/approvalService';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Approvals() {
+  const { isLight } = useTheme();
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('Pending');
@@ -45,35 +47,73 @@ export default function Approvals() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Visual Header Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.2) 50%, rgba(99, 102, 241, 0.15) 100%), url("https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
+        background: isLight 
+          ? 'linear-gradient(135deg, rgba(254, 243, 199, 0.96) 0%, rgba(255, 251, 235, 0.94) 50%, rgba(238, 242, 255, 0.96) 100%), url("https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat'
+          : 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.2) 50%, rgba(99, 102, 241, 0.15) 100%), url("https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid rgba(245, 158, 11, 0.35)',
+        border: isLight ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid rgba(245, 158, 11, 0.35)',
         padding: '2.2rem 2.5rem',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: 'var(--panel-shadow)',
+        boxShadow: isLight ? '0 16px 40px -10px rgba(15, 23, 42, 0.08)' : 'var(--panel-shadow)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1.5rem'
+        gap: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.78) 60%, rgba(2, 6, 23, 0.45) 100%)', pointerEvents: 'none' }} />
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          background: isLight 
+            ? 'linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.82) 60%, rgba(255, 255, 255, 0.45) 100%)' 
+            : 'linear-gradient(90deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.78) 60%, rgba(2, 6, 23, 0.45) 100%)', 
+          pointerEvents: 'none' 
+        }} />
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '650px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-full)', background: 'rgba(245, 158, 11, 0.2)', border: '1px solid rgba(245, 158, 11, 0.4)', color: '#fbbf24', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.75rem' }}>
-            <ShieldCheck size={14} color="#fbbf24" /> Human-in-the-Loop (HITL) Governance
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '0.45rem', 
+            padding: '0.3rem 0.8rem', 
+            borderRadius: 'var(--radius-full)', 
+            background: isLight ? 'rgba(245, 158, 11, 0.12)' : 'rgba(245, 158, 11, 0.2)', 
+            border: isLight ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid rgba(245, 158, 11, 0.4)', 
+            color: isLight ? '#d97706' : '#fbbf24', 
+            fontSize: '0.8rem', 
+            fontWeight: 700, 
+            marginBottom: '0.75rem' 
+          }}>
+            <ShieldCheck size={14} color={isLight ? '#d97706' : '#fbbf24'} /> Human-in-the-Loop (HITL) Governance
           </div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: '#fff', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.5px' }}>
             Manager Authorization Queue
           </h1>
-          <p style={{ color: 'var(--text-sub)', fontSize: '0.98rem', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: isLight ? '#475569' : 'var(--text-sub)', fontSize: '0.98rem', lineHeight: 1.6, margin: 0 }}>
             Supervised authorization for high-impact actions: extended leave requests (&gt; 3 days), high-value commercial orders (&gt; $1,000), and helpdesk customer escalations.
           </p>
         </div>
 
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <button onClick={fetchApprovals} style={{ background: 'rgba(2, 6, 23, 0.85)', border: '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.65rem 1.1rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 600 }} className="hover-lift">
+          <button 
+            onClick={fetchApprovals} 
+            style={{ 
+              background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.85)', 
+              border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)', 
+              color: isLight ? '#0f172a' : 'var(--text-main)', 
+              padding: '0.65rem 1.1rem', 
+              borderRadius: 'var(--radius-md)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              cursor: 'pointer', 
+              fontWeight: 600,
+              boxShadow: isLight ? '0 1px 3px rgba(15, 23, 42, 0.05)' : 'none'
+            }} 
+            className="hover-lift"
+          >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
           </button>
           {['Pending', 'Approved', 'Rejected', 'All'].map(tab => (
@@ -81,13 +121,14 @@ export default function Approvals() {
               key={tab}
               onClick={() => setFilter(tab)}
               style={{
-                background: filter === tab ? '#f59e0b' : 'rgba(2, 6, 23, 0.85)',
-                color: filter === tab ? 'white' : 'var(--text-muted)',
-                border: '1px solid var(--border-color)',
+                background: filter === tab ? '#f59e0b' : (isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.85)'),
+                color: filter === tab ? 'white' : (isLight ? '#475569' : 'var(--text-muted)'),
+                border: filter === tab ? '1px solid #f59e0b' : (isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)'),
                 padding: '0.65rem 1.2rem',
                 borderRadius: 'var(--radius-md)',
                 fontWeight: 600,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                boxShadow: isLight && filter !== tab ? '0 1px 3px rgba(15, 23, 42, 0.05)' : 'none'
               }}
               className="hover-lift"
             >

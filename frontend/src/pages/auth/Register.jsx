@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Mail, Lock, User, ArrowRight, Loader2, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Register() {
+  const { isLight } = useTheme();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,7 +38,7 @@ export default function Register() {
                 onChange={e => setName(e.target.value)}
                 required
                 placeholder="Jane Doe"
-                style={{ width: '100%', background: 'rgba(2, 6, 23, 0.5)', border: '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.8rem 1rem 0.8rem 2.75rem', borderRadius: 'var(--radius-md)', outline: 'none', fontSize: '0.95rem' }}
+                style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.5)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.8rem 1rem 0.8rem 2.75rem', borderRadius: 'var(--radius-md)', outline: 'none', fontSize: '0.95rem' }}
               />
             </div>
           </div>
@@ -50,7 +52,7 @@ export default function Register() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 placeholder="jane@company.com"
-                style={{ width: '100%', background: 'rgba(2, 6, 23, 0.5)', border: '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.8rem 1rem 0.8rem 2.75rem', borderRadius: 'var(--radius-md)', outline: 'none', fontSize: '0.95rem' }}
+                style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.5)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.8rem 1rem 0.8rem 2.75rem', borderRadius: 'var(--radius-md)', outline: 'none', fontSize: '0.95rem' }}
               />
             </div>
           </div>
@@ -64,7 +66,7 @@ export default function Register() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                style={{ width: '100%', background: 'rgba(2, 6, 23, 0.5)', border: '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.8rem 1rem 0.8rem 2.75rem', borderRadius: 'var(--radius-md)', outline: 'none', fontSize: '0.95rem' }}
+                style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.5)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.8rem 1rem 0.8rem 2.75rem', borderRadius: 'var(--radius-md)', outline: 'none', fontSize: '0.95rem' }}
               />
             </div>
           </div>
@@ -82,7 +84,7 @@ export default function Register() {
         </form>
 
         <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          Already have an account? <Link to="/login" style={{ color: 'white', textDecoration: 'none', fontWeight: '500' }}>Sign In</Link>
+          Already have an account? <Link to="/login" style={{ color: isLight ? 'var(--primary-color)' : 'white', textDecoration: 'none', fontWeight: '600' }}>Sign In</Link>
         </p>
       </div>
     </div>

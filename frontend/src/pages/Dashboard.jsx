@@ -2,11 +2,13 @@ import WelcomeCard from '../components/dashboard/WelcomeCard';
 import StatsGrid from '../components/dashboard/StatsGrid';
 import { Activity, Sparkles, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 import ActivityChart from '../components/dashboard/ActivityChart';
 import RecentActivity from '../components/dashboard/RecentActivity';
 
 export default function Dashboard() {
+  const { isLight } = useTheme();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -84,8 +86,8 @@ export default function Dashboard() {
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(2, 6, 23, 0.9) 100%)' }} />
-                <span style={{ position: 'absolute', top: '12px', left: '12px', padding: '0.25rem 0.65rem', borderRadius: '12px', background: `${hub.badgeColor}25`, border: `1px solid ${hub.badgeColor}60`, color: hub.badgeColor, fontSize: '0.72rem', fontWeight: 700, backdropFilter: 'blur(8px)' }}>
+                <div style={{ position: 'absolute', inset: 0, background: isLight ? 'linear-gradient(180deg, transparent 40%, rgba(255, 255, 255, 0.92) 100%)' : 'linear-gradient(180deg, transparent 40%, rgba(2, 6, 23, 0.9) 100%)' }} />
+                <span style={{ position: 'absolute', top: '12px', left: '12px', padding: '0.25rem 0.65rem', borderRadius: '12px', background: isLight ? '#ffffff' : `${hub.badgeColor}25`, border: isLight ? `1px solid ${hub.badgeColor}60` : `1px solid ${hub.badgeColor}60`, color: hub.badgeColor, fontSize: '0.72rem', fontWeight: 700, backdropFilter: 'blur(8px)', boxShadow: isLight ? '0 2px 6px rgba(15, 23, 42, 0.08)' : 'none' }}>
                   {hub.badge}
                 </span>
               </div>

@@ -2,8 +2,10 @@ import { Inbox, Send, MoreVertical, Users, TrendingUp } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCoordination } from '../context/CoordinationContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Coordination() {
+    const { isLight } = useTheme();
     const { user } = useAuth();
     const { threads } = useCoordination();
     const isEmployee = user?.role === 'employee';
@@ -78,7 +80,7 @@ export default function Coordination() {
                     {activeThread ? (
                         <>
                             {/* Chat Header */}
-                            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(2, 6, 23, 0.4)' }}>
+                            <div style={{ padding: '1.25rem 1.5rem', borderBottom: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: isLight ? '#f8fafc' : 'rgba(2, 6, 23, 0.4)' }}>
                                 <div>
                                     <h3 style={{ fontSize: '1.2rem', margin: '0 0 0.2rem 0' }}>{activeThread.title}</h3>
                                     <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Coordinating with: {activeThread.dept} Department</span>
@@ -113,7 +115,7 @@ export default function Coordination() {
                             {/* Chat Input */}
                             <div style={{ padding: '1.25rem 1.5rem', borderTop: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>
                                 <div style={{ position: 'relative' }}>
-                                    <input type="text" placeholder="Type a message to coordinate..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }} style={{ width: '100%', padding: '1rem 4rem 1rem 1.25rem', background: 'var(--bg-dark)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-full)', color: 'white', fontSize: '0.95rem' }} />
+                                    <input type="text" placeholder="Type a message to coordinate..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }} style={{ width: '100%', padding: '1rem 4rem 1rem 1.25rem', background: isLight ? '#ffffff' : 'var(--bg-dark)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)', borderRadius: 'var(--radius-full)', color: 'var(--text-main)', fontSize: '0.95rem' }} />
                                     <button onClick={handleSendMessage} style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'var(--primary-color)', color: 'white', border: 'none', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} className="hover-lift">
                                         <Send size={16} />
                                     </button>

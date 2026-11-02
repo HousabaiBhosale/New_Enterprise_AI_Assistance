@@ -5,6 +5,7 @@ import {
   X, Cpu, ArrowRight, ShieldCheck, Zap, HelpCircle, FileCheck
 } from 'lucide-react';
 import { documentService } from '../services/documentService';
+import { useTheme } from '../context/ThemeContext';
 
 // Built-in starter templates for realistic corporate knowledge bases
 const KNOWLEDGE_TEMPLATES = [
@@ -95,6 +96,7 @@ const KNOWLEDGE_TEMPLATES = [
 ];
 
 export default function Documents() {
+  const { isLight } = useTheme();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -316,29 +318,51 @@ export default function Documents() {
       
       {/* Visual Header Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.28) 0%, rgba(13, 148, 136, 0.22) 50%, rgba(99, 102, 241, 0.18) 100%), url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
+        background: isLight 
+          ? 'linear-gradient(135deg, rgba(240, 253, 250, 0.96) 0%, rgba(236, 253, 245, 0.94) 50%, rgba(238, 242, 255, 0.96) 100%), url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat'
+          : 'linear-gradient(135deg, rgba(20, 184, 166, 0.28) 0%, rgba(13, 148, 136, 0.22) 50%, rgba(99, 102, 241, 0.18) 100%), url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat',
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid rgba(20, 184, 166, 0.35)',
+        border: isLight ? '1px solid rgba(20, 184, 166, 0.35)' : '1px solid rgba(20, 184, 166, 0.35)',
         padding: '2.4rem 2.8rem',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: 'var(--panel-shadow)',
+        boxShadow: isLight ? '0 16px 40px -10px rgba(15, 23, 42, 0.08)' : 'var(--panel-shadow)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1.5rem'
+        gap: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.82) 60%, rgba(2, 6, 23, 0.5) 100%)', pointerEvents: 'none' }} />
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          background: isLight 
+            ? 'linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.82) 60%, rgba(255, 255, 255, 0.45) 100%)' 
+            : 'linear-gradient(90deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.82) 60%, rgba(2, 6, 23, 0.5) 100%)', 
+          pointerEvents: 'none' 
+        }} />
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '640px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', background: 'rgba(20, 184, 166, 0.22)', border: '1px solid rgba(20, 184, 166, 0.45)', color: '#2dd4bf', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.85rem' }}>
-            <Sparkles size={14} color="#2dd4bf" /> Qdrant Semantic Vector Knowledge Base
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            padding: '0.35rem 0.85rem', 
+            borderRadius: 'var(--radius-full)', 
+            background: isLight ? 'rgba(20, 184, 166, 0.12)' : 'rgba(20, 184, 166, 0.22)', 
+            border: isLight ? '1px solid rgba(20, 184, 166, 0.35)' : '1px solid rgba(20, 184, 166, 0.45)', 
+            color: isLight ? '#0d9488' : '#2dd4bf', 
+            fontSize: '0.82rem', 
+            fontWeight: 700, 
+            marginBottom: '0.85rem' 
+          }}>
+            <Sparkles size={14} color={isLight ? '#0d9488' : '#2dd4bf'} /> Qdrant Semantic Vector Knowledge Base
           </div>
-          <h1 style={{ fontSize: '2.3rem', fontWeight: '800', marginBottom: '0.5rem', color: '#fff', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '2.3rem', fontWeight: '800', marginBottom: '0.5rem', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.5px' }}>
             Enterprise Knowledge Base (RAG)
           </h1>
-          <p style={{ color: 'var(--text-sub)', fontSize: '0.96rem', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: isLight ? '#475569' : 'var(--text-sub)', fontSize: '0.96rem', lineHeight: 1.6, margin: 0 }}>
             Official company documentation, employee policies, commercial sales playbooks, and support triage SOPs vectorized for real-time agent retrieval without hallucinations.
           </p>
         </div>
@@ -495,12 +519,13 @@ export default function Documents() {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(2, 6, 23, 0.85)',
-              border: '1px solid var(--border-color)',
+              background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.85)',
+              border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)',
               padding: '0.65rem 1rem 0.65rem 2.6rem',
               borderRadius: 'var(--radius-md)',
-              color: 'white',
-              fontSize: '0.9rem'
+              color: isLight ? '#0f172a' : 'white',
+              fontSize: '0.9rem',
+              boxShadow: isLight ? '0 1px 3px rgba(15, 23, 42, 0.05)' : 'none'
             }}
           />
         </div>
@@ -513,10 +538,21 @@ export default function Documents() {
           <p style={{ fontSize: '1rem' }}>Querying Qdrant vector index and knowledge documents...</p>
         </div>
       ) : filteredDocs.length === 0 ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-lg)', background: 'rgba(2, 6, 23, 0.2)', padding: '3.5rem', textAlign: 'center' }}>
+        <div style={{ 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          border: isLight ? '2px dashed rgba(203, 213, 225, 0.9)' : '2px dashed var(--border-color)', 
+          borderRadius: 'var(--radius-lg)', 
+          background: isLight ? 'rgba(241, 245, 249, 0.6)' : 'rgba(2, 6, 23, 0.2)', 
+          padding: '3.5rem', 
+          textAlign: 'center' 
+        }}>
           <FolderOpen size={48} style={{ margin: '0 auto 1rem auto', opacity: 0.5, color: '#14b8a6' }} />
-          <h2 style={{ fontSize: '1.25rem', color: 'var(--text-main)', marginBottom: '0.5rem' }}>No Knowledge Bases Found</h2>
-          <p style={{ maxWidth: '480px', color: 'var(--text-sub)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.25rem', color: isLight ? '#0f172a' : 'var(--text-main)', marginBottom: '0.5rem' }}>No Knowledge Bases Found</h2>
+          <p style={{ maxWidth: '480px', color: isLight ? '#64748b' : 'var(--text-sub)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
             No documents matched your criteria. Add a new company policy, sales guide, or support SOP to empower the autonomous multi-agent copilot.
           </p>
           <button
@@ -524,7 +560,7 @@ export default function Documents() {
               setCreationTab('editor');
               setIsCreateModalOpen(true);
             }}
-            style={{ background: '#14b8a6', color: 'white', border: 'none', padding: '0.75rem 1.3rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            style={{ background: '#14b8a6', color: 'white', border: 'none', padding: '0.75rem 1.3rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(20, 184, 166, 0.3)' }}
           >
             <Plus size={16} /> Create Knowledge Base Now
           </button>
@@ -540,8 +576,8 @@ export default function Documents() {
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(2, 6, 23, 0.2) 0%, rgba(2, 6, 23, 0.92) 100%)' }} />
-                <span style={{ position: 'absolute', top: '10px', left: '12px', padding: '0.25rem 0.7rem', borderRadius: '12px', background: 'rgba(2, 6, 23, 0.85)', border: '1px solid rgba(255,255,255,0.18)', fontSize: '0.74rem', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <div style={{ position: 'absolute', inset: 0, background: isLight ? 'linear-gradient(180deg, transparent 35%, rgba(255, 255, 255, 0.92) 100%)' : 'linear-gradient(180deg, rgba(2, 6, 23, 0.2) 0%, rgba(2, 6, 23, 0.92) 100%)' }} />
+                <span style={{ position: 'absolute', top: '10px', left: '12px', padding: '0.25rem 0.7rem', borderRadius: '12px', background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.85)', border: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid rgba(255,255,255,0.18)', fontSize: '0.74rem', fontWeight: 600, color: isLight ? '#0f172a' : '#fff', display: 'flex', alignItems: 'center', gap: '0.35rem', boxShadow: isLight ? '0 2px 6px rgba(15, 23, 42, 0.08)' : 'none' }}>
                   <ShieldCheck size={13} color="#2dd4bf" /> {doc.category} Department
                 </span>
                 <span style={{ position: 'absolute', bottom: '10px', right: '12px', padding: '0.25rem 0.65rem', borderRadius: '8px', background: 'rgba(20, 184, 166, 0.95)', fontSize: '0.74rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -595,45 +631,51 @@ export default function Documents() {
       {/* Realistic Interactive RAG Semantic Search Playground */}
       <div style={{
         marginTop: '1rem',
-        background: 'rgba(2, 6, 23, 0.6)',
-        border: '1px solid rgba(99, 102, 241, 0.35)',
+        background: isLight ? '#f8fafc' : 'rgba(2, 6, 23, 0.6)',
+        border: isLight ? '1px solid rgba(99, 102, 241, 0.25)' : '1px solid rgba(99, 102, 241, 0.35)',
         borderRadius: 'var(--radius-lg)',
         padding: '1.8rem 2rem',
-        boxShadow: 'var(--panel-shadow)',
+        boxShadow: isLight ? '0 10px 30px -5px rgba(15, 23, 42, 0.05)' : 'var(--panel-shadow)',
         position: 'relative'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.25rem 0.75rem', borderRadius: 'var(--radius-full)', background: 'rgba(99, 102, 241, 0.2)', border: '1px solid rgba(99, 102, 241, 0.4)', color: '#a5b4fc', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-              <Zap size={13} color="#a5b4fc" /> Live RAG Retrieval Tester
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.25rem 0.75rem', borderRadius: 'var(--radius-full)', background: isLight ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.2)', border: isLight ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid rgba(99, 102, 241, 0.4)', color: isLight ? '#4f46e5' : '#a5b4fc', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+              <Zap size={13} color={isLight ? '#4f46e5' : '#a5b4fc'} /> Live RAG Retrieval Tester
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: isLight ? '#0f172a' : '#fff' }}>
               Test Semantic Vector Search Against Qdrant
             </h3>
-            <p style={{ margin: '0.35rem 0 0 0', color: 'var(--text-sub)', fontSize: '0.88rem' }}>
+            <p style={{ margin: '0.35rem 0 0 0', color: isLight ? '#475569' : 'var(--text-sub)', fontSize: '0.88rem' }}>
               Query the dense vector index to see how our RAG engine retrieves exact paragraphs and scores similarity before passing context to the LLM.
             </p>
           </div>
 
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => handleRunRAGSearch("What are the rules for sick leave?")}
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: '#e2e8f0', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', fontSize: '0.78rem', cursor: 'pointer' }}
-            >
-              "Sick leave policy"
-            </button>
-            <button
-              onClick={() => handleRunRAGSearch("What is the discount threshold for sales?")}
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: '#e2e8f0', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', fontSize: '0.78rem', cursor: 'pointer' }}
-            >
-              "Sales discount rules"
-            </button>
-            <button
-              onClick={() => handleRunRAGSearch("What is the response SLA for critical tickets?")}
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: '#e2e8f0', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', fontSize: '0.78rem', cursor: 'pointer' }}
-            >
-              "Critical ticket SLA"
-            </button>
+            {[
+              { label: '"Sick leave policy"', query: "What are the rules for sick leave?" },
+              { label: '"Sales discount rules"', query: "What is the discount threshold for sales?" },
+              { label: '"Critical ticket SLA"', query: "What is the response SLA for critical tickets?" }
+            ].map((chip, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleRunRAGSearch(chip.query)}
+                style={{ 
+                  background: isLight ? '#ffffff' : 'rgba(255,255,255,0.05)', 
+                  border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)', 
+                  color: isLight ? '#0f172a' : '#e2e8f0', 
+                  padding: '0.4rem 0.8rem', 
+                  borderRadius: 'var(--radius-md)', 
+                  fontSize: '0.78rem', 
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  boxShadow: isLight ? '0 1px 3px rgba(15, 23, 42, 0.04)' : 'none'
+                }}
+                className="hover-lift"
+              >
+                {chip.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -646,12 +688,13 @@ export default function Documents() {
             onKeyDown={(e) => { if (e.key === 'Enter') handleRunRAGSearch(); }}
             style={{
               flex: 1,
-              background: 'rgba(15, 23, 42, 0.9)',
-              border: '1px solid rgba(99, 102, 241, 0.4)',
+              background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.9)',
+              border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(99, 102, 241, 0.4)',
               padding: '0.85rem 1.25rem',
               borderRadius: 'var(--radius-md)',
-              color: 'white',
-              fontSize: '0.95rem'
+              color: isLight ? '#0f172a' : 'white',
+              fontSize: '0.95rem',
+              boxShadow: isLight ? '0 1px 3px rgba(15, 23, 42, 0.04)' : 'none'
             }}
           />
           <button
@@ -668,8 +711,10 @@ export default function Documents() {
               alignItems: 'center',
               gap: '0.5rem',
               cursor: (isSearchingRAG || !searchQuery.trim()) ? 'not-allowed' : 'pointer',
-              opacity: (isSearchingRAG || !searchQuery.trim()) ? 0.6 : 1
+              opacity: (isSearchingRAG || !searchQuery.trim()) ? 0.6 : 1,
+              boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)'
             }}
+            className="hover-lift"
           >
             {isSearchingRAG ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
             {isSearchingRAG ? 'Vector Searching...' : 'Run Vector Search'}
@@ -695,20 +740,26 @@ export default function Documents() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                 {ragResults.results.map((hit, idx) => (
-                  <div key={idx} style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(99, 102, 241, 0.25)', borderRadius: 'var(--radius-md)', padding: '1.1rem 1.25rem' }}>
+                  <div key={idx} style={{ 
+                    background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.75)', 
+                    border: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid rgba(99, 102, 241, 0.25)', 
+                    borderRadius: 'var(--radius-md)', 
+                    padding: '1.1rem 1.25rem',
+                    boxShadow: isLight ? '0 1px 3px rgba(15, 23, 42, 0.05)' : 'none'
+                  }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span style={{ background: '#4f46e5', color: '#fff', fontSize: '0.72rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: '4px' }}>
                           Match #{idx + 1}
                         </span>
-                        <strong style={{ fontSize: '0.92rem', color: '#fff' }}>{hit.title}</strong>
+                        <strong style={{ fontSize: '0.92rem', color: isLight ? '#0f172a' : '#fff' }}>{hit.title}</strong>
                         <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>({hit.source})</span>
                       </div>
-                      <span style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#34d399', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)' }}>
+                      <span style={{ background: isLight ? 'rgba(16, 185, 129, 0.12)' : 'rgba(16, 185, 129, 0.2)', border: isLight ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(16, 185, 129, 0.4)', color: isLight ? '#047857' : '#34d399', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)' }}>
                         Cosine Similarity: {hit.score}%
                       </span>
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-sub)', whiteSpace: 'pre-wrap', lineHeight: 1.5, background: 'rgba(2, 6, 23, 0.4)', padding: '0.75rem 1rem', borderRadius: '6px', borderLeft: '3px solid #6366f1' }}>
+                    <p style={{ margin: 0, fontSize: '0.88rem', color: isLight ? '#334155' : 'var(--text-sub)', whiteSpace: 'pre-wrap', lineHeight: 1.5, background: isLight ? '#f1f5f9' : 'rgba(2, 6, 23, 0.4)', padding: '0.75rem 1rem', borderRadius: '6px', borderLeft: '3px solid #6366f1' }}>
                       {hit.text}
                     </p>
                   </div>
@@ -726,7 +777,7 @@ export default function Documents() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(2, 6, 23, 0.85)',
+          background: isLight ? 'rgba(15, 23, 42, 0.45)' : 'rgba(2, 6, 23, 0.85)',
           backdropFilter: 'blur(8px)',
           display: 'flex',
           alignItems: 'center',
@@ -735,8 +786,8 @@ export default function Documents() {
           padding: '1.5rem'
         }}>
           <div style={{
-            background: '#0b1329',
-            border: '1px solid rgba(20, 184, 166, 0.4)',
+            background: isLight ? '#ffffff' : '#0b1329',
+            border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(20, 184, 166, 0.4)',
             borderRadius: 'var(--radius-lg)',
             width: '100%',
             maxWidth: '820px',
@@ -744,38 +795,38 @@ export default function Documents() {
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+            boxShadow: isLight ? '0 25px 50px -12px rgba(15, 23, 42, 0.2)' : '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
           }}>
             {/* Modal Header */}
-            <div style={{ padding: '1.5rem 1.8rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15, 23, 42, 0.6)' }}>
+            <div style={{ padding: '1.5rem 1.8rem', borderBottom: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: isLight ? '#f8fafc' : 'rgba(15, 23, 42, 0.6)' }}>
               <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#2dd4bf', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.25rem' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: isLight ? '#0d9488' : '#2dd4bf', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.25rem' }}>
                   <Sparkles size={14} /> Knowledge Ingestion Pipeline
                 </div>
-                <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+                <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: isLight ? '#0f172a' : '#fff' }}>
                   Add New Knowledge Base
                 </h2>
               </div>
               <button
                 onClick={() => !isSubmitting && setIsCreateModalOpen(false)}
                 disabled={isSubmitting}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: isLight ? '#64748b' : 'var(--text-muted)', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
               >
                 <X size={22} />
               </button>
             </div>
 
             {/* Ingestion Tabs */}
-            <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', background: 'rgba(2, 6, 23, 0.4)' }}>
+            <div style={{ display: 'flex', borderBottom: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', background: isLight ? '#f1f5f9' : 'rgba(2, 6, 23, 0.4)' }}>
               <button
                 onClick={() => setCreationTab('editor')}
                 style={{
                   flex: 1,
                   padding: '0.9rem',
-                  background: creationTab === 'editor' ? 'rgba(20, 184, 166, 0.15)' : 'transparent',
+                  background: creationTab === 'editor' ? (isLight ? '#ffffff' : 'rgba(20, 184, 166, 0.15)') : 'transparent',
                   border: 'none',
                   borderBottom: `2px solid ${creationTab === 'editor' ? '#14b8a6' : 'transparent'}`,
-                  color: creationTab === 'editor' ? '#2dd4bf' : 'var(--text-sub)',
+                  color: creationTab === 'editor' ? (isLight ? '#0d9488' : '#2dd4bf') : (isLight ? '#64748b' : 'var(--text-sub)'),
                   fontWeight: 700,
                   fontSize: '0.92rem',
                   cursor: 'pointer',
@@ -793,10 +844,10 @@ export default function Documents() {
                 style={{
                   flex: 1,
                   padding: '0.9rem',
-                  background: creationTab === 'upload' ? 'rgba(20, 184, 166, 0.15)' : 'transparent',
+                  background: creationTab === 'upload' ? (isLight ? '#ffffff' : 'rgba(20, 184, 166, 0.15)') : 'transparent',
                   border: 'none',
                   borderBottom: `2px solid ${creationTab === 'upload' ? '#14b8a6' : 'transparent'}`,
-                  color: creationTab === 'upload' ? '#2dd4bf' : 'var(--text-sub)',
+                  color: creationTab === 'upload' ? (isLight ? '#0d9488' : '#2dd4bf') : (isLight ? '#64748b' : 'var(--text-sub)'),
                   fontWeight: 700,
                   fontSize: '0.92rem',
                   cursor: 'pointer',
@@ -816,7 +867,7 @@ export default function Documents() {
               {/* Quick Template Selector */}
               {creationTab === 'editor' && (
                 <div>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.8rem', color: isLight ? '#64748b' : 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
                     ⚡ Quick Load Corporate Policy Templates:
                   </span>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -826,16 +877,18 @@ export default function Documents() {
                         type="button"
                         onClick={() => handleApplyTemplate(tpl)}
                         style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
-                          color: '#e2e8f0',
+                          background: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.05)',
+                          border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.12)',
+                          color: isLight ? '#0f172a' : '#e2e8f0',
                           padding: '0.35rem 0.75rem',
                           borderRadius: 'var(--radius-md)',
                           fontSize: '0.78rem',
+                          fontWeight: 600,
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '0.35rem'
+                          gap: '0.35rem',
+                          boxShadow: isLight ? '0 1px 3px rgba(15, 23, 42, 0.04)' : 'none'
                         }}
                         className="hover-lift"
                       >
@@ -850,7 +903,7 @@ export default function Documents() {
                 <form id="create-kb-form" onSubmit={handleCreateDocument} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-sub)', marginBottom: '0.4rem', fontWeight: 600 }}>
+                      <label style={{ display: 'block', fontSize: '0.82rem', color: isLight ? '#475569' : 'var(--text-sub)', marginBottom: '0.4rem', fontWeight: 600 }}>
                         Knowledge Base Title *
                       </label>
                       <input
@@ -861,18 +914,18 @@ export default function Documents() {
                         required
                         style={{
                           width: '100%',
-                          background: 'rgba(2, 6, 23, 0.75)',
-                          border: '1px solid var(--border-color)',
+                          background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.75)',
+                          border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)',
                           padding: '0.75rem 1rem',
                           borderRadius: 'var(--radius-md)',
-                          color: 'white',
+                          color: isLight ? '#0f172a' : 'white',
                           fontSize: '0.9rem'
                         }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-sub)', marginBottom: '0.4rem', fontWeight: 600 }}>
+                      <label style={{ display: 'block', fontSize: '0.82rem', color: isLight ? '#475569' : 'var(--text-sub)', marginBottom: '0.4rem', fontWeight: 600 }}>
                         Department / Category *
                       </label>
                       <select
@@ -880,11 +933,11 @@ export default function Documents() {
                         onChange={(e) => setDocCategory(e.target.value)}
                         style={{
                           width: '100%',
-                          background: 'rgba(2, 6, 23, 0.9)',
-                          border: '1px solid var(--border-color)',
+                          background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.9)',
+                          border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)',
                           padding: '0.75rem 1rem',
                           borderRadius: 'var(--radius-md)',
-                          color: 'white',
+                          color: isLight ? '#0f172a' : 'white',
                           fontSize: '0.9rem'
                         }}
                       >
@@ -900,10 +953,10 @@ export default function Documents() {
 
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                      <label style={{ fontSize: '0.82rem', color: 'var(--text-sub)', fontWeight: 600 }}>
-                        Markdown Document Body * (Use <code style={{ color: '#2dd4bf' }}>##</code> headers to split into semantic chunks)
+                      <label style={{ fontSize: '0.82rem', color: isLight ? '#475569' : 'var(--text-sub)', fontWeight: 600 }}>
+                        Markdown Document Body * (Use <code style={{ color: '#0d9488' }}>##</code> headers to split into semantic chunks)
                       </label>
-                      <span style={{ fontSize: '0.76rem', color: '#2dd4bf', fontWeight: 600 }}>
+                      <span style={{ fontSize: '0.76rem', color: isLight ? '#0d9488' : '#2dd4bf', fontWeight: 600 }}>
                         Estimated Chunks: ~{estimatedChunks}
                       </span>
                     </div>
@@ -915,11 +968,11 @@ export default function Documents() {
                       rows={10}
                       style={{
                         width: '100%',
-                        background: 'rgba(2, 6, 23, 0.75)',
-                        border: '1px solid var(--border-color)',
+                        background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.75)',
+                        border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)',
                         padding: '1rem',
                         borderRadius: 'var(--radius-md)',
-                        color: 'white',
+                        color: isLight ? '#0f172a' : 'white',
                         fontFamily: 'monospace',
                         fontSize: '0.88rem',
                         lineHeight: 1.6,
@@ -929,22 +982,22 @@ export default function Documents() {
                   </div>
 
                   {/* Vector Pipeline Specifications Badge */}
-                  <div style={{ background: 'rgba(20, 184, 166, 0.08)', border: '1px solid rgba(20, 184, 166, 0.25)', borderRadius: 'var(--radius-md)', padding: '0.85rem 1.1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div style={{ background: isLight ? '#f0fdfa' : 'rgba(20, 184, 166, 0.08)', border: isLight ? '1px solid rgba(20, 184, 166, 0.3)' : '1px solid rgba(20, 184, 166, 0.25)', borderRadius: 'var(--radius-md)', padding: '0.85rem 1.1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Database size={16} color="#2dd4bf" />
-                      <span style={{ fontSize: '0.82rem', color: 'var(--text-sub)' }}>
-                        Target Qdrant Collection: <strong style={{ color: '#fff' }}>enterprise_docs</strong>
+                      <Database size={16} color={isLight ? '#0d9488' : '#2dd4bf'} />
+                      <span style={{ fontSize: '0.82rem', color: isLight ? '#475569' : 'var(--text-sub)' }}>
+                        Target Qdrant Collection: <strong style={{ color: isLight ? '#0f172a' : '#fff' }}>enterprise_docs</strong>
                       </span>
                     </div>
-                    <div style={{ fontSize: '0.82rem', color: 'var(--text-sub)' }}>
-                      Embedder: <strong style={{ color: '#2dd4bf' }}>BAAI/bge-small-en-v1.5 (384-d Cosine)</strong>
+                    <div style={{ fontSize: '0.82rem', color: isLight ? '#475569' : 'var(--text-sub)' }}>
+                      Embedder: <strong style={{ color: isLight ? '#0d9488' : '#2dd4bf' }}>BAAI/bge-small-en-v1.5 (384-d Cosine)</strong>
                     </div>
                   </div>
                 </form>
               ) : (
                 <form id="upload-kb-form" onSubmit={handleUploadSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-sub)', marginBottom: '0.4rem', fontWeight: 600 }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', color: isLight ? '#475569' : 'var(--text-sub)', marginBottom: '0.4rem', fontWeight: 600 }}>
                       Department / Category *
                     </label>
                     <select
@@ -952,11 +1005,11 @@ export default function Documents() {
                       onChange={(e) => setUploadCategory(e.target.value)}
                       style={{
                         width: '100%',
-                        background: 'rgba(2, 6, 23, 0.9)',
-                        border: '1px solid var(--border-color)',
+                        background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.9)',
+                        border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)',
                         padding: '0.75rem 1rem',
                         borderRadius: 'var(--radius-md)',
-                        color: 'white',
+                        color: isLight ? '#0f172a' : 'white',
                         fontSize: '0.9rem'
                       }}
                     >
@@ -972,11 +1025,11 @@ export default function Documents() {
                   <div
                     onClick={() => fileInputRef.current?.click()}
                     style={{
-                      border: '2px dashed rgba(20, 184, 166, 0.5)',
+                      border: isLight ? '2px dashed rgba(20, 184, 166, 0.6)' : '2px dashed rgba(20, 184, 166, 0.5)',
                       borderRadius: 'var(--radius-lg)',
                       padding: '3rem 2rem',
                       textAlign: 'center',
-                      background: 'rgba(2, 6, 23, 0.4)',
+                      background: isLight ? 'rgba(240, 253, 250, 0.6)' : 'rgba(2, 6, 23, 0.4)',
                       cursor: 'pointer',
                       transition: 'border 0.2s ease'
                     }}
@@ -991,15 +1044,15 @@ export default function Documents() {
                       style={{ display: 'none' }}
                       accept=".md,.txt,.pdf,.csv"
                     />
-                    <Upload size={38} style={{ color: '#2dd4bf', margin: '0 auto 0.75rem' }} />
-                    <h3 style={{ margin: '0 0 0.35rem 0', color: '#fff', fontSize: '1.1rem' }}>
+                    <Upload size={38} style={{ color: isLight ? '#0d9488' : '#2dd4bf', margin: '0 auto 0.75rem' }} />
+                    <h3 style={{ margin: '0 0 0.35rem 0', color: isLight ? '#0f172a' : '#fff', fontSize: '1.1rem' }}>
                       {selectedFile ? selectedFile.name : 'Click to select or drop policy document'}
                     </h3>
-                    <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    <p style={{ margin: 0, color: isLight ? '#64748b' : 'var(--text-muted)', fontSize: '0.85rem' }}>
                       Supports Markdown (.md), Text (.txt), PDF (.pdf), and CSV (.csv) up to 25 MB
                     </p>
                     {selectedFile && (
-                      <div style={{ marginTop: '1rem', display: 'inline-block', background: 'rgba(20, 184, 166, 0.2)', border: '1px solid #14b8a6', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', color: '#2dd4bf', fontSize: '0.8rem', fontWeight: 600 }}>
+                      <div style={{ marginTop: '1rem', display: 'inline-block', background: isLight ? 'rgba(20, 184, 166, 0.15)' : 'rgba(20, 184, 166, 0.2)', border: '1px solid #14b8a6', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', color: isLight ? '#0d9488' : '#2dd4bf', fontSize: '0.8rem', fontWeight: 600 }}>
                         Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
                       </div>
                     )}
@@ -1009,16 +1062,16 @@ export default function Documents() {
 
               {/* Ingestion Steps Progress (if submitting) */}
               {isSubmitting && (
-                <div style={{ background: 'rgba(2, 6, 23, 0.8)', border: '1px solid rgba(20, 184, 166, 0.4)', borderRadius: 'var(--radius-md)', padding: '1.25rem' }}>
+                <div style={{ background: isLight ? '#f8fafc' : 'rgba(2, 6, 23, 0.8)', border: isLight ? '1px solid rgba(20, 184, 166, 0.35)' : '1px solid rgba(20, 184, 166, 0.4)', borderRadius: 'var(--radius-md)', padding: '1.25rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                    <RefreshCw size={20} className="animate-spin" color="#2dd4bf" />
-                    <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem' }}>
+                    <RefreshCw size={20} className="animate-spin" color={isLight ? '#0d9488' : '#2dd4bf'} />
+                    <span style={{ fontWeight: 700, color: isLight ? '#0f172a' : '#fff', fontSize: '0.95rem' }}>
                       {ingestionStep === 1 && 'Parsing document & extracting section headings...'}
                       {ingestionStep === 2 && 'Generating 384-dimensional dense vectors (FastEmbed)...'}
                       {ingestionStep === 3 && 'Upserting points to Qdrant collection [enterprise_docs]...'}
                     </span>
                   </div>
-                  <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: '6px', background: isLight ? '#e2e8f0' : 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{ width: `${(ingestionStep / 3) * 100}%`, height: '100%', background: 'linear-gradient(90deg, #14b8a6, #2dd4bf)', transition: 'width 0.4s ease' }} />
                   </div>
                 </div>
@@ -1026,12 +1079,12 @@ export default function Documents() {
             </div>
 
             {/* Modal Footer */}
-            <div style={{ padding: '1.25rem 1.8rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end', gap: '1rem', background: 'rgba(15, 23, 42, 0.6)' }}>
+            <div style={{ padding: '1.25rem 1.8rem', borderTop: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end', gap: '1rem', background: isLight ? '#f8fafc' : 'rgba(15, 23, 42, 0.6)' }}>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
                 disabled={isSubmitting}
-                style={{ background: 'transparent', border: '1px solid var(--border-color)', color: '#cbd5e1', padding: '0.75rem 1.4rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+                style={{ background: 'transparent', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid var(--border-color)', color: isLight ? '#475569' : '#cbd5e1', padding: '0.75rem 1.4rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
               >
                 Cancel
               </button>
@@ -1093,7 +1146,7 @@ export default function Documents() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(2, 6, 23, 0.85)',
+          background: isLight ? 'rgba(15, 23, 42, 0.45)' : 'rgba(2, 6, 23, 0.85)',
           backdropFilter: 'blur(8px)',
           display: 'flex',
           alignItems: 'center',
@@ -1102,8 +1155,8 @@ export default function Documents() {
           padding: '1.5rem'
         }}>
           <div style={{
-            background: '#0b1329',
-            border: '1px solid rgba(20, 184, 166, 0.4)',
+            background: isLight ? '#ffffff' : '#0b1329',
+            border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(20, 184, 166, 0.4)',
             borderRadius: 'var(--radius-lg)',
             width: '100%',
             maxWidth: '900px',
@@ -1111,42 +1164,42 @@ export default function Documents() {
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+            boxShadow: isLight ? '0 25px 50px -12px rgba(15, 23, 42, 0.2)' : '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
           }}>
             {/* Inspector Header */}
-            <div style={{ padding: '1.5rem 1.8rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15, 23, 42, 0.6)' }}>
+            <div style={{ padding: '1.5rem 1.8rem', borderBottom: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: isLight ? '#f8fafc' : 'rgba(15, 23, 42, 0.6)' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                  <span style={{ padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(20, 184, 166, 0.2)', border: '1px solid rgba(20, 184, 166, 0.4)', color: '#2dd4bf', fontSize: '0.74rem', fontWeight: 700 }}>
+                  <span style={{ padding: '0.2rem 0.6rem', borderRadius: '12px', background: isLight ? 'rgba(20, 184, 166, 0.12)' : 'rgba(20, 184, 166, 0.2)', border: isLight ? '1px solid rgba(20, 184, 166, 0.35)' : '1px solid rgba(20, 184, 166, 0.4)', color: isLight ? '#0d9488' : '#2dd4bf', fontSize: '0.74rem', fontWeight: 700 }}>
                     {previewDoc.category} Knowledge Base
                   </span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.8rem', color: isLight ? '#64748b' : 'var(--text-muted)' }}>
                     • Source: {previewDoc.filename}
                   </span>
                 </div>
-                <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>
+                <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: isLight ? '#0f172a' : '#fff' }}>
                   {previewDoc.title || previewDoc.filename}
                 </h2>
               </div>
               <button
                 onClick={() => setPreviewDoc(null)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: isLight ? '#64748b' : 'var(--text-muted)', cursor: 'pointer' }}
               >
                 <X size={22} />
               </button>
             </div>
 
             {/* Mode Switcher */}
-            <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', background: 'rgba(2, 6, 23, 0.4)' }}>
+            <div style={{ display: 'flex', borderBottom: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', background: isLight ? '#f1f5f9' : 'rgba(2, 6, 23, 0.4)' }}>
               <button
                 onClick={() => setPreviewViewMode('reader')}
                 style={{
                   flex: 1,
                   padding: '0.85rem',
-                  background: previewViewMode === 'reader' ? 'rgba(20, 184, 166, 0.15)' : 'transparent',
+                  background: previewViewMode === 'reader' ? (isLight ? '#ffffff' : 'rgba(20, 184, 166, 0.15)') : 'transparent',
                   border: 'none',
                   borderBottom: `2px solid ${previewViewMode === 'reader' ? '#14b8a6' : 'transparent'}`,
-                  color: previewViewMode === 'reader' ? '#2dd4bf' : 'var(--text-sub)',
+                  color: previewViewMode === 'reader' ? (isLight ? '#0d9488' : '#2dd4bf') : (isLight ? '#64748b' : 'var(--text-sub)'),
                   fontWeight: 700,
                   fontSize: '0.9rem',
                   cursor: 'pointer',
@@ -1164,10 +1217,10 @@ export default function Documents() {
                 style={{
                   flex: 1,
                   padding: '0.85rem',
-                  background: previewViewMode === 'chunks' ? 'rgba(20, 184, 166, 0.15)' : 'transparent',
+                  background: previewViewMode === 'chunks' ? (isLight ? '#ffffff' : 'rgba(20, 184, 166, 0.15)') : 'transparent',
                   border: 'none',
                   borderBottom: `2px solid ${previewViewMode === 'chunks' ? '#14b8a6' : 'transparent'}`,
-                  color: previewViewMode === 'chunks' ? '#2dd4bf' : 'var(--text-sub)',
+                  color: previewViewMode === 'chunks' ? (isLight ? '#0d9488' : '#2dd4bf') : (isLight ? '#64748b' : 'var(--text-sub)'),
                   fontWeight: 700,
                   fontSize: '0.9rem',
                   cursor: 'pointer',
@@ -1189,8 +1242,8 @@ export default function Documents() {
                   <p>Loading document text from repository...</p>
                 </div>
               ) : previewViewMode === 'reader' ? (
-                <div style={{ background: 'rgba(2, 6, 23, 0.5)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-                  <pre style={{ margin: 0, fontFamily: 'inherit', whiteSpace: 'pre-wrap', lineHeight: 1.7, color: '#e2e8f0', fontSize: '0.92rem' }}>
+                <div style={{ background: isLight ? '#f8fafc' : 'rgba(2, 6, 23, 0.5)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)' }}>
+                  <pre style={{ margin: 0, fontFamily: 'inherit', whiteSpace: 'pre-wrap', lineHeight: 1.7, color: isLight ? '#0f172a' : '#e2e8f0', fontSize: '0.92rem' }}>
                     {previewDoc.content || "Document content not available on disk."}
                   </pre>
                 </div>
@@ -1198,16 +1251,16 @@ export default function Documents() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {(previewDoc.chunks_list && previewDoc.chunks_list.length > 0) ? (
                     previewDoc.chunks_list.map((chunk, idx) => (
-                      <div key={idx} style={{ background: 'rgba(15, 23, 42, 0.8)', border: '1px solid rgba(20, 184, 166, 0.25)', borderRadius: 'var(--radius-md)', padding: '1.2rem' }}>
+                      <div key={idx} style={{ background: isLight ? '#f8fafc' : 'rgba(15, 23, 42, 0.8)', border: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid rgba(20, 184, 166, 0.25)', borderRadius: 'var(--radius-md)', padding: '1.2rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                           <span style={{ background: '#0d9488', color: '#fff', fontSize: '0.74rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
                             Vector Chunk #{idx + 1}
                           </span>
-                          <span style={{ fontSize: '0.75rem', color: '#2dd4bf', background: 'rgba(20, 184, 166, 0.1)', padding: '0.2rem 0.55rem', borderRadius: '4px' }}>
+                          <span style={{ fontSize: '0.75rem', color: isLight ? '#0d9488' : '#2dd4bf', background: isLight ? 'rgba(20, 184, 166, 0.12)' : 'rgba(20, 184, 166, 0.1)', padding: '0.2rem 0.55rem', borderRadius: '4px' }}>
                             Embedding: 384 float32 dimensions
                           </span>
                         </div>
-                        <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', lineHeight: 1.6, whiteSpace: 'pre-wrap', background: 'rgba(2, 6, 23, 0.5)', padding: '0.85rem', borderRadius: '6px', borderLeft: '3px solid #14b8a6' }}>
+                        <p style={{ margin: 0, fontSize: '0.88rem', color: isLight ? '#334155' : '#cbd5e1', lineHeight: 1.6, whiteSpace: 'pre-wrap', background: isLight ? '#ffffff' : 'rgba(2, 6, 23, 0.5)', padding: '0.85rem', borderRadius: '6px', borderLeft: '3px solid #14b8a6', border: isLight ? '1px solid rgba(226, 232, 240, 0.8)' : 'none' }}>
                           {chunk}
                         </p>
                       </div>
@@ -1222,13 +1275,13 @@ export default function Documents() {
             </div>
 
             {/* Inspector Footer */}
-            <div style={{ padding: '1.25rem 1.8rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15, 23, 42, 0.6)' }}>
-              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                Index: <strong style={{ color: '#fff' }}>enterprise_docs</strong> • Metric: <strong style={{ color: '#2dd4bf' }}>Cosine Distance</strong>
+            <div style={{ padding: '1.25rem 1.8rem', borderTop: isLight ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: isLight ? '#f8fafc' : 'rgba(15, 23, 42, 0.6)' }}>
+              <div style={{ fontSize: '0.82rem', color: isLight ? '#64748b' : 'var(--text-muted)' }}>
+                Index: <strong style={{ color: isLight ? '#0f172a' : '#fff' }}>enterprise_docs</strong> • Metric: <strong style={{ color: isLight ? '#0d9488' : '#2dd4bf' }}>Cosine Distance</strong>
               </div>
               <button
                 onClick={() => setPreviewDoc(null)}
-                style={{ background: '#14b8a6', color: 'white', border: 'none', padding: '0.65rem 1.4rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: 'pointer' }}
+                style={{ background: '#14b8a6', color: 'white', border: 'none', padding: '0.65rem 1.4rem', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 15px rgba(20, 184, 166, 0.3)' }}
               >
                 Close Inspector
               </button>
