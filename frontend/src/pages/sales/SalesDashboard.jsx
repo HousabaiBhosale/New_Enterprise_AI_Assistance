@@ -290,7 +290,7 @@ export default function SalesDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {[
             {
-              title: "ResolveX AI Enterprise Cluster",
+              title: "NexusCore Enterprise AI Cluster",
               desc: "Dedicated GPU multi-agent node orchestrating real-time LangGraph workflows and custom vector stores.",
               tag: "$4,500 / node",
               image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",

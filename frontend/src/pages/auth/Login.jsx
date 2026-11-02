@@ -695,20 +695,33 @@ export default function Login() {
         </div>
 
         <h1 style={{ 
-          fontSize: '2.7rem', 
+          fontSize: '2.85rem', 
           fontWeight: '800', 
-          marginBottom: '0.35rem', 
-          letterSpacing: '-0.7px', 
-          background: isLight 
-            ? 'linear-gradient(135deg, #0f172a 35%, #1e293b 65%, #2563eb 100%)' 
-            : 'linear-gradient(135deg, #ffffff 40%, #e2e8f0 75%, #94a3b8 100%)', 
-          WebkitBackgroundClip: 'text', 
-          WebkitTextFillColor: 'transparent',
-          textShadow: isLight ? 'none' : '0 4px 24px rgba(0, 0, 0, 0.4)'
+          marginBottom: '0.45rem', 
+          letterSpacing: '-0.8px', 
+          color: isLight ? '#0f172a' : '#ffffff',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+          textShadow: isLight ? 'none' : '0 2px 20px rgba(0, 0, 0, 0.5)'
         }}>
-          ResolveX Enterprise
+          <span>NexusCore</span>
+          <span style={{ 
+            color: '#2563eb',
+            background: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(59, 130, 246, 0.15)',
+            border: isLight ? '1px solid rgba(37, 99, 235, 0.25)' : '1px solid rgba(59, 130, 246, 0.35)',
+            padding: '0.15rem 0.65rem',
+            borderRadius: '10px',
+            fontSize: '1.45rem',
+            fontWeight: 700,
+            letterSpacing: '0.8px'
+          }}>
+            ENTERPRISE
+          </span>
         </h1>
-        <p style={{ color: isLight ? '#334155' : '#94a3b8', fontSize: '1rem', margin: '0 auto', lineHeight: 1.4, maxWidth: '600px', fontWeight: 500 }}>
+        <p style={{ color: isLight ? '#475569' : '#94a3b8', fontSize: '1rem', margin: '0 auto', lineHeight: 1.5, maxWidth: '640px', fontWeight: 500 }}>
           Select your department portal below to access your specialized autonomous AI agents
         </p>
       </div>
