@@ -39,8 +39,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="Agentic Enterprise AI Assistant API",
-    description="Backend API for Agentic Enterprise AI Assistant with Multi-Agent Workflows, RAG, RBAC, and HITL",
+    title="ResolveX Enterprise Multi-Agent API",
+    description="Backend API for ResolveX Enterprise Multi-Agent Operating System with Multi-Agent Workflows, RAG, RBAC, and HITL",
     version="2.0.0",
     lifespan=lifespan
 )

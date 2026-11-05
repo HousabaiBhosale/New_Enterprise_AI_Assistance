@@ -105,9 +105,9 @@ export default function Sidebar() {
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-            <h1 style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '0.4px', color: isLight ? '#0f172a' : '#fff', margin: 0 }}>NexusCore</h1>
+            <h1 style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '0.4px', color: isLight ? '#0f172a' : '#fff', margin: 0 }}>ResolveX</h1>
             <span style={{ fontSize: '0.65rem', background: isLight ? 'rgba(99, 102, 241, 0.12)' : 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%)', color: isLight ? '#4f46e5' : '#c084fc', padding: '0.12rem 0.45rem', borderRadius: '4px', fontWeight: 800, border: isLight ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid rgba(168, 85, 247, 0.4)' }}>
-              v2.5
+              AI
             </span>
           </div>
           <span style={{ fontSize: '0.74rem', color: isLight ? '#475569' : 'var(--text-sub)', textTransform: 'capitalize', display: 'block', marginTop: '0.15rem' }}>

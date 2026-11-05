@@ -17,7 +17,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem('enterprise_auth_user');
-      return stored ? JSON.parse(stored) : null;
+      const token = localStorage.getItem('enterprise_auth_token');
+      return (stored && token) ? JSON.parse(stored) : null;
     } catch (_) {
       return null;
     }
@@ -37,16 +38,10 @@ export function AuthProvider({ children }) {
       navigate(target);
       return data;
     } catch (err) {
-      console.warn("Backend auth failed, attempting fallback:", err);
-      // Fallback for offline demo if backend is not reachable
-      const role = roleHint || (email.includes('admin') ? 'admin' : (email.includes('hr') ? 'hr' : (email.includes('sales') ? 'sales' : (email.includes('support') ? 'support' : 'employee'))));
-      const fallbackUser = { id: 1, email, role, name: `${role.toUpperCase()} User`, department: `${role.toUpperCase()} Operations` };
-      setUser(fallbackUser);
-      localStorage.setItem('enterprise_auth_user', JSON.stringify(fallbackUser));
       setIsLoading(false);
-      const target = getHomeRouteForRole(role);
-      navigate(target);
-      return { user: fallbackUser };
+      const message = err.message || "Invalid email or password";
+      setAuthError(message);
+      throw err;
     }
   };
 
@@ -61,14 +56,10 @@ export function AuthProvider({ children }) {
       navigate(target);
       return data;
     } catch (err) {
-      console.warn("Backend register failed, fallback:", err);
-      const fallbackUser = { id: Date.now(), email, role, name, department };
-      setUser(fallbackUser);
-      localStorage.setItem('enterprise_auth_user', JSON.stringify(fallbackUser));
       setIsLoading(false);
-      const target = getHomeRouteForRole(role);
-      navigate(target);
-      return { user: fallbackUser };
+      const message = err.message || "Registration failed";
+      setAuthError(message);
+      throw err;
     }
   };
 

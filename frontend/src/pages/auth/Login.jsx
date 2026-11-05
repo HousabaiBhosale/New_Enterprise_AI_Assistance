@@ -3,25 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mail, Lock, ArrowRight, Loader2, Sparkles, Users, TrendingUp, 
   HelpCircle, Briefcase, KeyRound, Shield, CheckCircle2, 
-  ChevronLeft, ChevronRight, Pause, Play, Zap, Cpu, Sun, Moon
+  ChevronLeft, ChevronRight, Pause, Play, Zap, Cpu, Sun, Moon,
+  AlertCircle, Eye, EyeOff, X
 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
-export default function Login() {
-  const { roleId } = useParams();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login, isLoading } = useAuth();
-  const { theme, setTheme, isLight } = useTheme();
-
-  // Speed selection: 'fast' (1500ms) or 'normal' (3000ms)
-  const [speedMode, setSpeedMode] = useState('fast');
-
-  // All 5 cards in circular order: Employee, HR, System Admin (center initial), Sales, Support
-  const allRoles = [
+// All 5 cards in circular order: Employee, HR, System Admin (center initial), Sales, Support
+const ALL_ROLES = [
     {
       id: 'employee',
       label: 'Employee Self-Service',
@@ -105,16 +95,41 @@ export default function Login() {
     },
   ];
 
-  // Active Index: Starts at 2 (System Administrator initially in the center)
-  const [activeIndex, setActiveIndex] = useState(2);
+export default function Login() {
+  const { roleId } = useParams();
+  const navigate = useNavigate();
+  const allRoles = ALL_ROLES;
+
+  const [selectedRole, setSelectedRole] = useState(() => {
+    if (roleId) {
+      return ALL_ROLES.find(r => r.id === roleId.toLowerCase()) || null;
+    }
+    return null;
+  });
+
+  const [email, setEmail] = useState(() => {
+    if (roleId) {
+      const r = ALL_ROLES.find(item => item.id === roleId.toLowerCase());
+      return r ? r.email : '';
+    }
+    return '';
+  });
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState('');
+  const { login, isLoading } = useAuth();
+  const { theme, setTheme, isLight } = useTheme();
+
+  // Active Index: Starts at 0 (Employee Self-Service)
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1200
   );
 
-  // Fast auto-rotation speed: 1500ms (fast) or 3000ms (normal)
-  const autoSlideInterval = speedMode === 'fast' ? 1500 : 3000;
-  const transitionDuration = speedMode === 'fast' ? 0.45 : 0.7;
+  // Fast auto-rotation speed: smooth 1.8s interval
+  const autoSlideInterval = 1800;
+  const transitionDuration = 0.5;
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -122,26 +137,31 @@ export default function Login() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const currentRole = roleId ? allRoles.find(r => r.id === roleId.toLowerCase()) : null;
-
   // Auto-Slide: ALL cards round fast and automatically in continuous sequence
   useEffect(() => {
-    if (isPaused || currentRole) return;
+    if (isPaused || selectedRole) return;
 
     const timer = setInterval(() => {
       setActiveIndex(prev => (prev + 1) % allRoles.length);
     }, autoSlideInterval);
 
     return () => clearInterval(timer);
-  }, [isPaused, currentRole, allRoles.length, autoSlideInterval]);
+  }, [isPaused, selectedRole, allRoles.length, autoSlideInterval]);
 
-  // Sync credentials on roleId changes
+  // Clean URL and sanitize :roleId param into active modal state
   useEffect(() => {
-    if (roleId && currentRole) {
-      setEmail(currentRole.email);
-      setPassword('password123');
+    if (roleId) {
+      const matched = ALL_ROLES.find(r => r.id === roleId.toLowerCase());
+      if (matched) {
+        setSelectedRole(matched);
+        setEmail(matched.email);
+        setPassword('');
+        setFormError('');
+      }
+      // Instantly replace URL to /login so reloading or bookmarking never gets stuck on /login/:roleId
+      navigate('/login', { replace: true });
     }
-  }, [roleId, currentRole]);
+  }, [roleId, navigate]);
 
   const handleNext = () => {
     setActiveIndex(prev => (prev + 1) % allRoles.length);
@@ -151,25 +171,33 @@ export default function Login() {
     setActiveIndex(prev => (prev - 1 + allRoles.length) % allRoles.length);
   };
 
-  const handleQuickLogin = (roleItem) => {
-    login(roleItem.email, 'password123', roleItem.id);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(email, password, roleId || 'employee');
+    setFormError('');
+    if (!password) {
+      setFormError('Please enter your password.');
+      return;
+    }
+    try {
+      await login(email, password, selectedRole?.id || 'employee');
+    } catch (err) {
+      setFormError(err.message || 'Invalid email or password. Please check your credentials.');
+    }
   };
 
-  // Keyboard Navigation (Left / Right Arrow Keys)
+  // Keyboard Navigation (Left / Right Arrow Keys, Escape to close modal)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (currentRole) return;
+      if (selectedRole) {
+        if (e.key === 'Escape') setSelectedRole(null);
+        return;
+      }
       if (e.key === 'ArrowRight') handleNext();
       if (e.key === 'ArrowLeft') handlePrev();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentRole]);
+  }, [selectedRole]);
 
   // 3D Perspective Slot Calculations matching the user's reference image
   const getSlotStyle = (offset) => {
@@ -254,137 +282,6 @@ export default function Login() {
     }
   };
 
-  // Dedicated Login Form view when a department is selected
-  if (currentRole) {
-    const Icon = currentRole.icon;
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 1 }}>
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="glass-panel" 
-          style={{ 
-            width: '100%', 
-            maxWidth: '460px', 
-            borderRadius: '24px', 
-            position: 'relative', 
-            background: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(12, 19, 35, 0.92)',
-            backdropFilter: 'blur(32px)',
-            WebkitBackdropFilter: 'blur(32px)',
-            border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : `1px solid ${currentRole.color}50`, 
-            boxShadow: isLight ? '0 25px 60px -15px rgba(15, 23, 42, 0.16)' : `0 24px 60px -15px ${currentRole.color}40, 0 10px 40px rgba(0, 0, 0, 0.7)`,
-            overflow: 'hidden'
-          }}
-        >
-          {/* Card Top Banner with Real Photo */}
-          <div style={{ position: 'relative', width: '100%', height: '140px', overflow: 'hidden' }}>
-            <img 
-              src={currentRole.image} 
-              alt={currentRole.label}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.85) contrast(1.05)' }}
-            />
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: isLight ? 'linear-gradient(to bottom, transparent 40%, rgba(255, 255, 255, 0.9) 100%)' : 'linear-gradient(to bottom, rgba(12, 19, 35, 0.2) 0%, rgba(12, 19, 35, 0.95) 100%)' }} />
-            
-            <button 
-              onClick={() => navigate('/login')} 
-              style={{ position: 'absolute', top: '1rem', left: '1rem', background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.15)', color: isLight ? '#0f172a' : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', fontWeight: 600, padding: '0.4rem 0.85rem', borderRadius: '999px', boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.06)' : 'none' }} 
-              className="hover-lift"
-            >
-              &larr; Switch Department
-            </button>
-          </div>
-
-          <div style={{ padding: '1.2rem 2.2rem 2.4rem 2.2rem' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.8rem' }}>
-              <div style={{ width: '62px', height: '62px', borderRadius: '16px', background: currentRole.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', marginTop: '-32px', boxShadow: `0 8px 26px ${currentRole.color}50`, border: '2px solid rgba(255, 255, 255, 0.4)', position: 'relative', zIndex: 2 }}>
-                <Icon size={32} color="#fff" />
-              </div>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '0.35rem', textAlign: 'center', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.3px' }}>{currentRole.label}</h1>
-              <p style={{ color: isLight ? '#475569' : '#94a3b8', textAlign: 'center', fontSize: '0.88rem' }}>Authenticate to launch your specialized autonomous workspace</p>
-            </div>
-
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.86rem', marginBottom: '0.45rem', fontWeight: '600', color: isLight ? '#334155' : '#e2e8f0' }}>Enterprise Email</label>
-                <div style={{ position: 'relative' }}>
-                  <Mail size={17} color={isLight ? '#94a3b8' : '#64748b'} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                    placeholder={currentRole.email}
-                    style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 1rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}
-                  />
-                </div>
-              </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
-                  <label style={{ fontSize: '0.86rem', fontWeight: '600', color: isLight ? '#334155' : '#e2e8f0' }}>Password</label>
-                  <span style={{ fontSize: '0.78rem', color: currentRole.color, fontWeight: 700 }}>Default: password123</span>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <Lock size={17} color={isLight ? '#94a3b8' : '#64748b'} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                    placeholder="••••••••"
-                    style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 1rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}
-                  />
-                </div>
-              </div>
-
-              {/* Quick Demo Fill Helper */}
-              <div style={{ padding: '0.8rem 1rem', background: isLight ? 'rgba(241, 245, 249, 0.8)' : 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: isLight ? '1px dashed rgba(203, 213, 225, 0.9)' : '1px dashed rgba(255, 255, 255, 0.12)', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: isLight ? '#475569' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                  <KeyRound size={15} color={currentRole.color} /> Demo: <strong style={{ color: isLight ? '#0f172a' : '#fff' }}>{currentRole.email}</strong>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => { setEmail(currentRole.email); setPassword('password123'); }}
-                  style={{ background: currentRole.accentBg, border: `1px solid ${currentRole.color}60`, color: currentRole.color, borderRadius: '6px', padding: '0.25rem 0.65rem', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 700 }}
-                >
-                  Auto-fill
-                </button>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                style={{ 
-                  marginTop: '0.3rem', 
-                  background: currentRole.gradient, 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '0.95rem', 
-                  borderRadius: '12px', 
-                  fontWeight: '700', 
-                  fontSize: '1rem', 
-                  cursor: isLoading ? 'default' : 'pointer', 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  gap: '0.5rem', 
-                  boxShadow: `0 8px 26px ${currentRole.color}45`, 
-                  opacity: isLoading ? 0.7 : 1,
-                  transition: 'all 0.2s ease'
-                }}
-                className={!isLoading ? "hover-lift" : ""}
-              >
-                {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
-                  <>Sign In & Launch Agent <ArrowRight size={18} /></>
-                )}
-              </button>
-            </form>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
   // Coverflow Card Renderer (Exactly matching user reference screenshot)
   const renderCoverflowCard = (role, index) => {
     // Calculate circular relative offset from activeIndex: -2, -1, 0, 1, 2
@@ -434,8 +331,12 @@ export default function Login() {
         }}
         onClick={() => {
           if (!isCenter) {
-            // Clicking any side card immediately rotates it to the center!
             setActiveIndex(index);
+          } else {
+            setSelectedRole(role);
+            setEmail(role.email);
+            setPassword('');
+            setFormError('');
           }
         }}
       >
@@ -493,12 +394,15 @@ export default function Login() {
             {role.sub}
           </p>
 
-          {/* Rounded Pill Button matching the reference screenshot "Explore" */}
+          {/* Rounded Pill Login Button */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem', width: '100%', marginTop: 'auto' }}>
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleQuickLogin(role);
+                setSelectedRole(role);
+                setEmail(role.email);
+                setPassword('');
+                setFormError('');
               }}
               style={{
                 display: 'inline-flex',
@@ -506,7 +410,7 @@ export default function Login() {
                 justifyContent: 'center',
                 gap: '0.5rem',
                 padding: '0.65rem 2.2rem',
-                borderRadius: '999px', // Pill button exactly like reference screenshot
+                borderRadius: '999px',
                 border: isCenter 
                   ? 'none' 
                   : (isLight ? '1px solid rgba(203, 213, 225, 0.95)' : '1px solid rgba(255, 255, 255, 0.2)'),
@@ -524,24 +428,11 @@ export default function Login() {
                 transition: 'all 0.2s ease',
               }}
               className="hover-lift"
-              title="Launch Workspace"
+              title={`Login to ${role.label}`}
             >
-              <Sparkles size={14} color={isCenter ? '#ffffff' : role.color} />
-              Explore
+              <KeyRound size={15} color={isCenter ? '#ffffff' : (isLight ? role.color : '#ffffff')} />
+              Login
             </button>
-
-            {/* Subtle Custom Auth link */}
-            <span 
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/login/${role.id}`);
-              }}
-              style={{ fontSize: '0.74rem', color: isLight ? '#64748b' : '#64748b', cursor: 'pointer', textDecoration: 'underline', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => e.target.style.color = isLight ? '#0f172a' : '#94a3b8'}
-              onMouseLeave={(e) => e.target.style.color = '#64748b'}
-            >
-              Custom Auth Login
-            </span>
           </div>
         </div>
       </motion.div>
@@ -551,149 +442,69 @@ export default function Login() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1.5rem 1rem', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
       
+      {/* Sleek Top-Right Theme Toggle */}
+      <div style={{ 
+        position: 'absolute', 
+        top: '1.25rem', 
+        right: '1.5rem', 
+        zIndex: 50,
+        display: 'inline-flex', 
+        alignItems: 'center', 
+        background: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(15, 23, 42, 0.85)', 
+        border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.12)', 
+        borderRadius: '999px', 
+        padding: '0.2rem', 
+        backdropFilter: 'blur(16px)', 
+        boxShadow: isLight ? '0 4px 14px rgba(15, 23, 42, 0.06)' : '0 4px 14px rgba(0, 0, 0, 0.4)' 
+      }}>
+        <button
+          onClick={() => setTheme('dark')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            padding: '0.32rem 0.75rem',
+            borderRadius: '999px',
+            border: 'none',
+            background: !isLight ? 'linear-gradient(135deg, #4f46e5, #6366f1)' : 'transparent',
+            color: !isLight ? '#ffffff' : '#64748b',
+            fontSize: '0.76rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: !isLight ? '0 2px 8px rgba(99, 102, 241, 0.4)' : 'none',
+            transition: 'all 0.2s ease',
+          }}
+          title="Dark Theme"
+        >
+          <Moon size={12} color={!isLight ? '#ffffff' : '#94a3b8'} />
+          Dark
+        </button>
+        <button
+          onClick={() => setTheme('light')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            padding: '0.32rem 0.75rem',
+            borderRadius: '999px',
+            border: 'none',
+            background: isLight ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'transparent',
+            color: isLight ? '#ffffff' : '#64748b',
+            fontSize: '0.76rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: isLight ? '0 2px 8px rgba(37, 99, 235, 0.35)' : 'none',
+            transition: 'all 0.2s ease',
+          }}
+          title="Light Theme"
+        >
+          <Sun size={12} color={isLight ? '#ffffff' : '#94a3b8'} />
+          Light
+        </button>
+      </div>
+
       {/* Top Header Section */}
-      <div style={{ textAlign: 'center', marginBottom: '1.2rem', maxWidth: '820px' }}>
-        
-        {/* Top Controls Row: Enterprise Badge + Theme Selector + Speed Toggle */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', marginBottom: '0.8rem' }}>
-          
-          {/* Subtle Enterprise Badge */}
-          <div style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            gap: '0.5rem', 
-            padding: '0.35rem 1rem', 
-            borderRadius: '999px', 
-            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', 
-            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(59, 130, 246, 0.35)', 
-            color: isLight ? '#0f172a' : '#e2e8f0', 
-            fontSize: '0.8rem', 
-            fontWeight: 600, 
-            letterSpacing: '0.3px', 
-            boxShadow: isLight ? '0 4px 14px rgba(15, 23, 42, 0.06)' : '0 6px 20px rgba(59, 130, 246, 0.2)',
-            backdropFilter: 'blur(16px)'
-          }}>
-            <Cpu size={14} color="#3b82f6" />
-            3D Coverflow Multi-Agent Architecture
-            <span style={{ opacity: 0.35, margin: '0 2px' }}>•</span>
-            <span style={{ color: isLight ? '#2563eb' : '#93c5fd', fontWeight: 700 }}>5 Domains Active</span>
-          </div>
-
-          {/* Theme Selector: Dark and Light Option */}
-          <div style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', 
-            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.12)', 
-            borderRadius: '999px', 
-            padding: '0.2rem', 
-            backdropFilter: 'blur(16px)', 
-            boxShadow: isLight ? '0 4px 14px rgba(15, 23, 42, 0.06)' : 'none' 
-          }}>
-            <button
-              onClick={() => setTheme('dark')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.32rem 0.8rem',
-                borderRadius: '999px',
-                border: 'none',
-                background: !isLight ? 'linear-gradient(135deg, #4f46e5, #6366f1)' : 'transparent',
-                color: !isLight ? '#ffffff' : '#64748b',
-                fontSize: '0.76rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: !isLight ? '0 2px 8px rgba(99, 102, 241, 0.4)' : 'none',
-                transition: 'all 0.2s ease',
-              }}
-              title="Select Dark Theme"
-            >
-              <Moon size={12} color={!isLight ? '#ffffff' : '#94a3b8'} />
-              Dark
-            </button>
-            <button
-              onClick={() => setTheme('light')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.32rem 0.8rem',
-                borderRadius: '999px',
-                border: 'none',
-                background: isLight ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'transparent',
-                color: isLight ? '#ffffff' : '#64748b',
-                fontSize: '0.76rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: isLight ? '0 2px 8px rgba(37, 99, 235, 0.35)' : 'none',
-                transition: 'all 0.2s ease',
-              }}
-              title="Select Light Theme"
-            >
-              <Sun size={12} color={isLight ? '#ffffff' : '#94a3b8'} />
-              Light
-            </button>
-          </div>
-
-          {/* Speed Mode Selector */}
-          <div style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.8)', 
-            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.12)', 
-            borderRadius: '999px', 
-            padding: '0.2rem', 
-            backdropFilter: 'blur(16px)', 
-            boxShadow: isLight ? '0 4px 14px rgba(15, 23, 42, 0.06)' : 'none' 
-          }}>
-            <button
-              onClick={() => setSpeedMode('fast')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.32rem 0.8rem',
-                borderRadius: '999px',
-                border: 'none',
-                background: speedMode === 'fast' ? 'linear-gradient(135deg, #10b981, #059669)' : 'transparent',
-                color: speedMode === 'fast' ? '#ffffff' : (isLight ? '#64748b' : '#94a3b8'),
-                fontSize: '0.76rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: speedMode === 'fast' ? '0 2px 8px rgba(16, 185, 129, 0.35)' : 'none',
-                transition: 'all 0.2s ease',
-              }}
-              title="Rotate cards quickly (1.5s)"
-            >
-              <Zap size={11} color={speedMode === 'fast' ? '#ffffff' : '#94a3b8'} />
-              Fast (1.5s)
-            </button>
-            <button
-              onClick={() => setSpeedMode('normal')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.32rem 0.8rem',
-                borderRadius: '999px',
-                border: 'none',
-                background: speedMode === 'normal' ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'transparent',
-                color: speedMode === 'normal' ? '#ffffff' : (isLight ? '#64748b' : '#94a3b8'),
-                fontSize: '0.76rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: speedMode === 'normal' ? '0 2px 8px rgba(37, 99, 235, 0.35)' : 'none',
-                transition: 'all 0.2s ease',
-              }}
-              title="Rotate cards at standard pace (3s)"
-            >
-              Normal (3s)
-            </button>
-          </div>
-
-        </div>
-
+      <div style={{ textAlign: 'center', marginBottom: '1.5rem', maxWidth: '820px' }}>
         <h1 style={{ 
           fontSize: '2.85rem', 
           fontWeight: '800', 
@@ -707,7 +518,7 @@ export default function Login() {
           flexWrap: 'wrap',
           textShadow: isLight ? 'none' : '0 2px 20px rgba(0, 0, 0, 0.5)'
         }}>
-          <span>NexusCore</span>
+          <span>ResolveX</span>
           <span style={{ 
             color: '#2563eb',
             background: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(59, 130, 246, 0.15)',
@@ -722,7 +533,7 @@ export default function Login() {
           </span>
         </h1>
         <p style={{ color: isLight ? '#475569' : '#94a3b8', fontSize: '1rem', margin: '0 auto', lineHeight: 1.5, maxWidth: '640px', fontWeight: 500 }}>
-          Select your department portal below to access your specialized autonomous AI agents
+          Autonomous Multi-Agent Enterprise Intelligence • Select a department portal to launch
         </p>
       </div>
 
@@ -838,31 +649,284 @@ export default function Login() {
         })}
       </div>
 
-      {/* Auto-Slide Status Indicator */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.3rem' }}>
-        <button
-          onClick={() => setIsPaused(!isPaused)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.35rem',
-            padding: '0.25rem 0.75rem',
-            borderRadius: '999px',
-            border: isLight ? '1px solid rgba(226, 232, 240, 0.95)' : '1px solid rgba(255, 255, 255, 0.1)',
-            background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.65)',
-            color: isPaused ? '#d97706' : (isLight ? '#059669' : '#34d399'),
-            fontSize: '0.74rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            backdropFilter: 'blur(12px)',
-            boxShadow: isLight ? '0 2px 8px rgba(15, 23, 42, 0.05)' : 'none',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          {isPaused ? <Play size={10} color="#d97706" /> : <Pause size={10} color={isLight ? '#059669' : '#34d399'} />}
-          {isPaused ? 'Auto-Slide Paused' : `Auto-Rotating Fast (${autoSlideInterval / 1000}s)`}
-        </button>
-      </div>
+      {/* ========================================================================= */}
+      {/* IN-PAGE CREDENTIALS MODAL (Smooth Overlay over 3D Coverflow)               */}
+      {/* ========================================================================= */}
+      <AnimatePresence>
+        {selectedRole && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedRole(null)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1.5rem',
+              background: isLight ? 'rgba(15, 23, 42, 0.45)' : 'rgba(2, 6, 23, 0.78)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel"
+              style={{
+                width: '100%',
+                maxWidth: '460px',
+                borderRadius: '24px',
+                position: 'relative',
+                background: isLight ? 'rgba(255, 255, 255, 0.97)' : 'rgba(12, 19, 35, 0.94)',
+                backdropFilter: 'blur(32px)',
+                WebkitBackdropFilter: 'blur(32px)',
+                border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : `1px solid ${selectedRole.color}60`,
+                boxShadow: isLight
+                  ? '0 25px 60px -15px rgba(15, 23, 42, 0.25)'
+                  : `0 24px 60px -15px ${selectedRole.color}45, 0 10px 40px rgba(0, 0, 0, 0.85)`,
+                overflow: 'hidden',
+              }}
+            >
+              {/* Card Top Banner with Real Photo */}
+              <div style={{ position: 'relative', width: '100%', height: '140px', overflow: 'hidden' }}>
+                <img
+                  src={selectedRole.image}
+                  alt={selectedRole.label}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.85) contrast(1.05)' }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: isLight
+                      ? 'linear-gradient(to bottom, transparent 35%, rgba(255, 255, 255, 0.95) 100%)'
+                      : 'linear-gradient(to bottom, rgba(12, 19, 35, 0.2) 0%, rgba(12, 19, 35, 0.96) 100%)',
+                  }}
+                />
+
+                {/* Back / Switch Agent Button */}
+                <button
+                  onClick={() => setSelectedRole(null)}
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    left: '1rem',
+                    background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.85)',
+                    border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.15)',
+                    color: isLight ? '#0f172a' : '#fff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '999px',
+                    boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.06)' : 'none',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                  className="hover-lift"
+                >
+                  &larr; Switch Agent
+                </button>
+
+                {/* Close ✕ Button */}
+                <button
+                  onClick={() => setSelectedRole(null)}
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.85)',
+                    border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.15)',
+                    color: isLight ? '#0f172a' : '#fff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.06)' : 'none',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                  className="hover-lift"
+                  title="Close (Esc)"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Form Content */}
+              <div style={{ padding: '1.2rem 2.2rem 2.4rem 2.2rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.8rem' }}>
+                  <div
+                    style={{
+                      width: '62px',
+                      height: '62px',
+                      borderRadius: '16px',
+                      background: selectedRole.gradient,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '1rem',
+                      marginTop: '-32px',
+                      boxShadow: `0 8px 26px ${selectedRole.color}50`,
+                      border: '2px solid rgba(255, 255, 255, 0.4)',
+                      position: 'relative',
+                      zIndex: 2,
+                    }}
+                  >
+                    {(() => {
+                      const IconComp = selectedRole.icon;
+                      return <IconComp size={32} color="#fff" />;
+                    })()}
+                  </div>
+                  <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '0.35rem', textAlign: 'center', color: isLight ? '#0f172a' : '#fff', letterSpacing: '-0.3px' }}>
+                    {selectedRole.label}
+                  </h1>
+                  <p style={{ color: isLight ? '#475569' : '#94a3b8', textAlign: 'center', fontSize: '0.88rem' }}>
+                    Authenticate to launch your specialized autonomous workspace
+                  </p>
+                </div>
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                  {formError && (
+                    <div style={{
+                      padding: '0.75rem 1rem',
+                      background: isLight ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.18)',
+                      border: isLight ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(239, 68, 68, 0.5)',
+                      borderRadius: '12px',
+                      color: isLight ? '#b91c1c' : '#fca5a5',
+                      fontSize: '0.85rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.55rem',
+                      fontWeight: 500,
+                    }}>
+                      <AlertCircle size={16} color={isLight ? '#b91c1c' : '#fca5a5'} />
+                      <span>{formError}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.86rem', marginBottom: '0.45rem', fontWeight: '600', color: isLight ? '#334155' : '#e2e8f0' }}>Enterprise Email</label>
+                    <div style={{ position: 'relative' }}>
+                      <Mail size={17} color={isLight ? '#94a3b8' : '#64748b'} style={{ pointerEvents: 'none', position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+                      <input
+                        type="email"
+                        name="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        placeholder="e.g. admin@enterprise.com"
+                        style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 1rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
+                      <label style={{ fontSize: '0.86rem', fontWeight: '600', color: isLight ? '#334155' : '#e2e8f0' }}>Password</label>
+                      <span style={{ fontSize: '0.78rem', color: selectedRole.color, fontWeight: 700 }}>Default: password123</span>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <Lock size={17} color={isLight ? '#94a3b8' : '#64748b'} style={{ pointerEvents: 'none', position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                        placeholder="Enter password (e.g. password123)"
+                        style={{ width: '100%', background: isLight ? '#ffffff' : 'rgba(8, 13, 26, 0.85)', border: isLight ? '1px solid rgba(203, 213, 225, 0.9)' : '1px solid rgba(255, 255, 255, 0.12)', color: isLight ? '#0f172a' : '#f8fafc', padding: '0.85rem 2.85rem 0.85rem 2.65rem', borderRadius: '12px', outline: 'none', fontSize: '0.94rem', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '0.85rem',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'transparent',
+                          border: 'none',
+                          color: isLight ? '#94a3b8' : '#64748b',
+                          cursor: 'pointer',
+                          padding: '0.25rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                        title={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Quick Demo Fill Helper */}
+                  <div style={{ padding: '0.8rem 1rem', background: isLight ? 'rgba(241, 245, 249, 0.8)' : 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: isLight ? '1px dashed rgba(203, 213, 225, 0.9)' : '1px dashed rgba(255, 255, 255, 0.12)', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: isLight ? '#475569' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <KeyRound size={15} color={selectedRole.color} /> Demo: <strong style={{ color: isLight ? '#0f172a' : '#fff' }}>{selectedRole.email}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { setEmail(selectedRole.email); setPassword('password123'); setFormError(''); }}
+                      style={{ background: selectedRole.accentBg, border: `1px solid ${selectedRole.color}60`, color: selectedRole.color, borderRadius: '6px', padding: '0.25rem 0.65rem', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 700 }}
+                    >
+                      Auto-fill
+                    </button>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    style={{
+                      marginTop: '0.3rem',
+                      background: selectedRole.gradient,
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.95rem',
+                      borderRadius: '12px',
+                      fontWeight: '700',
+                      fontSize: '1rem',
+                      cursor: isLoading ? 'default' : 'pointer',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      boxShadow: `0 8px 26px ${selectedRole.color}45`,
+                      opacity: isLoading ? 0.7 : 1,
+                      transition: 'all 0.2s ease',
+                    }}
+                    className={!isLoading ? "hover-lift" : ""}
+                  >
+                    {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
+                      <>Sign In & Launch Agent <ArrowRight size={18} /></>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
