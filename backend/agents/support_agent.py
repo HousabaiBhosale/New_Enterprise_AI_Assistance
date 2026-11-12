@@ -142,6 +142,9 @@ def process_support_query(state: AgentState):
         )
     }
     
-    result = agent.invoke({"messages": [sys_msg] + messages})
-    new_messages = result["messages"][1 + len(messages):]
-    return {"messages": new_messages}
+    try:
+        result = agent.invoke({"messages": [sys_msg] + messages})
+        new_messages = result["messages"][1 + len(messages):]
+        return {"messages": new_messages}
+    except Exception as e:
+        return {"messages": [AIMessage(content=f"Could you please confirm your Customer ID, the subject of the issue, and a brief description so I can log your helpdesk ticket?")]}

@@ -27,6 +27,7 @@ export default function SalesDashboard() {
   const handleAskSalesAI = async (customQuery) => {
     const q = customQuery || query;
     if (!q.trim()) return;
+    setQuery("");
     setChatLoading(true);
     setChatResponse(null);
     try {

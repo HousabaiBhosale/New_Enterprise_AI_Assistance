@@ -1,4 +1,6 @@
 import os
+import re
+import shutil
 from datetime import datetime, timedelta
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from langchain_core.tools import tool
@@ -157,7 +159,9 @@ def generate_employee_leave_report(employee_id: int) -> str:
             (models.ApprovalRequest.title.ilike(f"%Employee {emp.id}%"))
         ).order_by(models.ApprovalRequest.id.desc()).all()
         
-        filename = f"leave_report_employee_{employee_id}.pdf"
+        timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"leave_report_employee_{employee_id}_{timestamp_str}.pdf"
+        static_filename = f"leave_report_employee_{employee_id}.pdf"
         
         content_lines = [
             f"Employee Name: {emp.name}",
@@ -187,6 +191,16 @@ def generate_employee_leave_report(employee_id: int) -> str:
             "content_lines": content_lines,
             "filename": filename
         })
+
+        # Also write/copy to static name so direct links always stay valid
+        try:
+            ensure_reports_dir()
+            ts_path = os.path.join(REPORTS_DIR, filename)
+            st_path = os.path.join(REPORTS_DIR, static_filename)
+            if os.path.exists(ts_path):
+                shutil.copy2(ts_path, st_path)
+        except Exception:
+            pass
         
         download_url = f"http://localhost:8000/api/reports/download/{filename}"
         log_audit(db, action="EMPLOYEE_LEAVE_REPORT_GENERATED", resource="HR_AGENT", details=f"Generated PDF for emp #{employee_id}: {filename}")
@@ -224,7 +238,205 @@ def query_hr_policy(query: str) -> str:
         return f"Enterprise HR Policy Knowledge Base:\n{context}"
     return "No matching HR policy information found in the knowledge repository."
 
+def parse_leave_application(messages):
+    """
+    Enforces the sequential leave application rule:
+    Question 1: Employee ID
+    Question 2: Number of Days
+    Question 3: Reason
+    
+    The next question is only asked after completing the answer for the previous question.
+    """
+    history_texts = []
+    for m in messages:
+        if isinstance(m, dict):
+            history_texts.append(m.get('content', ''))
+        else:
+            history_texts.append(getattr(m, 'content', ''))
+            
+    full_text = ' '.join(history_texts).lower()
+    
+    # Check if this is an inquiry about past leaves, report generation, balance, or policy
+    if any(k in full_text for k in ['report', 'reports', 'history', 'previous leaves', 'past leaves', 'leave balance', 'remaining balance', 'policy']):
+        if not any(k in full_text for k in ['apply for', 'apply leave', 'take leave', 'request leave']):
+            return None
+
+    # Check if user wants to apply for leave or is in an active leave application flow
+    is_apply = any(k in full_text for k in [
+        'apply', 'take leave', 'request leave', 'book leave', 'need leave', 'want leave', 'on leave',
+        'applying for leave', 'vacation leave', 'sick leave', 'medical leave'
+    ])
+    if not is_apply:
+        for m in messages:
+            txt = (m.get('content', '') if isinstance(m, dict) else getattr(m, 'content', '')).lower()
+            if 'employee id' in txt or 'days of leave' in txt or 'reason for your leave' in txt:
+                is_apply = True
+                break
+
+    if not is_apply:
+        return None
+
+    # Get the latest user message
+    last_user_text = ''
+    for m in reversed(messages):
+        role = m.get('role', '') if isinstance(m, dict) else getattr(m, 'type', '')
+        if role in ['human', 'user']:
+            last_user_text = (m.get('content', '') if isinstance(m, dict) else getattr(m, 'content', '')).strip()
+            break
+
+    emp_id = None
+    days = None
+
+    # Turn-by-turn conversational analysis
+    for i in range(len(messages) - 1):
+        curr_msg = messages[i]
+        next_msg = messages[i+1]
+        curr_text = (curr_msg.get('content', '') if isinstance(curr_msg, dict) else getattr(curr_msg, 'content', '')).lower()
+        next_text = (next_msg.get('content', '') if isinstance(next_msg, dict) else getattr(next_msg, 'content', '')).strip()
+        
+        # Check if assistant asked for employee ID
+        if ('provide your' in curr_text or 'enter your' in curr_text or 'what is your' in curr_text) and 'employee id' in curr_text:
+            m_num = re.search(r'\b(\d+)\b', next_text)
+            if m_num:
+                emp_id = int(m_num.group(1))
+        # Check if assistant asked for number of days
+        elif 'how many days' in curr_text or 'number of leave days' in curr_text or 'days of leave would you like' in curr_text:
+            m_num = re.search(r'\b(\d+)\b', next_text)
+            if m_num:
+                days = int(m_num.group(1))
+
+    # Also extract explicit patterns across all messages
+    for m in messages:
+        txt = (m.get('content', '') if isinstance(m, dict) else getattr(m, 'content', '')).lower()
+        m_e = re.findall(r'(?:employee|emp)\s*(?:id)?\s*[#:=]?\s*(\d+)', txt)
+        if m_e:
+            emp_id = int(m_e[-1])
+        m_d = re.findall(r'\b(\d+)\s*(?:days?|day)\b', txt)
+        if m_d:
+            days = int(m_d[-1])
+
+    # Check standalone number in last message if still missing
+    if emp_id is None and re.fullmatch(r'\d+', last_user_text):
+        for m in reversed(messages[:-1]):
+            c = (m.get('content', '') if isinstance(m, dict) else getattr(m, 'content', '')).lower()
+            if 'employee id' in c or 'your id' in c:
+                emp_id = int(last_user_text)
+                break
+
+    # 3. Extract reason
+    reason = None
+    reason_keywords = [
+        'vacation', 'annual leave', 'family function', 'marriage', 'wedding',
+        'sick', 'seak', 'seek', 'medical', 'fever', 'doctor', 'hospital', 'illness',
+        'personal', 'casual', 'emergency', 'holiday', 'trip', 'travel',
+        'maternity', 'paternity', 'bereavement', 'rest', 'burnout'
+    ]
+    for rk in reason_keywords:
+        if rk in full_text:
+            reason = 'Sick leave' if rk in ['sick', 'seak', 'seek', 'medical', 'fever', 'illness', 'doctor', 'hospital'] else rk.capitalize()
+            break
+
+    m_reas = re.search(r'reason\s*(?:is|:)?\s*([a-zA-Z\s]{3,30})', full_text)
+    if m_reas and not reason:
+        reason = m_reas.group(1).strip().capitalize()
+
+    return {
+        'is_apply': True,
+        'emp_id': emp_id,
+        'days': days,
+        'reason': reason
+    }
+
 def process_hr_query(state: AgentState):
+    messages = state["messages"]
+
+    # Check sequential leave application flow
+    info = parse_leave_application(messages)
+    if info and info['is_apply']:
+        emp_id = info['emp_id']
+        days = info['days']
+        reason = info['reason']
+
+        # Step 1: Employee ID must be answered first
+        if emp_id is None:
+            details = []
+            if days:
+                details.append(f"**{days} days**")
+            if reason:
+                details.append(f"Reason: **{reason}**")
+            
+            if details:
+                joined_details = ", ".join(details)
+                prefix = f"I have noted your leave details ({joined_details}). "
+            else:
+                prefix = ""
+            return {"messages": [AIMessage(content=f"{prefix}Could you please provide your **Employee ID**?")]}
+
+        # Step 2: Once Employee ID is answered, confirm days
+        if days is None:
+            prefix = f"Employee ID #{emp_id} confirmed. " if emp_id else ""
+            return {"messages": [AIMessage(content=f"{prefix}How many days of leave would you like to apply for?")]}
+
+        # Step 3: Once Employee ID and days are answered, confirm reason
+        if not reason:
+            return {"messages": [AIMessage(content=f"Employee ID #{emp_id} for **{days} days** noted. What is the reason for your leave (e.g., vacation, medical, family function)?")]}
+
+        # Step 4: All questions answered! Execute apply_leave_request
+        try:
+            result_str = apply_leave_request.invoke({
+                "employee_id": emp_id,
+                "days": days,
+                "reason": reason
+            })
+            return {"messages": [AIMessage(content=result_str)]}
+        except Exception as e:
+            return {"messages": [AIMessage(content=f"Leave application failed: {str(e)}")]}
+
+    # Extract last user query
+    last_user_query = ""
+    for m in reversed(messages):
+        role = m.get('role', '') if isinstance(m, dict) else getattr(m, 'type', '')
+        if role in ['human', 'user']:
+            last_user_query = (m.get('content', '') if isinstance(m, dict) else getattr(m, 'content', '')).strip()
+            break
+
+    q_low = last_user_query.lower()
+
+    # 1. Direct Leave Report generation (e.g. 'Generate a PDF leave report for employee 2', 'give me the reports of the applied leave for employee id 1')
+    if any(k in q_low for k in ['report', 'reports', 'pdf']) and any(k in q_low for k in ['generate', 'give me', 'create', 'download', 'applied', 'leave']):
+        m_id = re.search(r'(?:employee|emp|id|#)\s*[:=]?\s*(\d+)', q_low)
+        if m_id:
+            emp_id = int(m_id.group(1))
+            try:
+                hist_str = get_leave_history.invoke({"employee_id": emp_id})
+                rep_str = generate_employee_leave_report.invoke({"employee_id": emp_id})
+                return {"messages": [AIMessage(content=f"{hist_str}\n\n{rep_str}")]}
+            except Exception:
+                pass
+
+    # 2. Direct Leave balance query (e.g. 'Check leave balance for employee 1')
+    if any(k in q_low for k in ['balance', 'how many days']) and 'leave' in q_low:
+        m_id = re.search(r'(?:employee|emp|id|#)\s*[:=]?\s*(\d+)', q_low)
+        if m_id:
+            emp_id = int(m_id.group(1))
+            try:
+                res = check_leave_balance.invoke({"employee_id": emp_id})
+                return {"messages": [AIMessage(content=res)]}
+            except Exception:
+                pass
+
+    # 3. Direct Leave history query (e.g. 'Show leave history for employee 2')
+    if any(k in q_low for k in ['history', 'previous leaves', 'past leaves', 'applied leaves']) and 'leave' in q_low:
+        m_id = re.search(r'(?:employee|emp|id|#)\s*[:=]?\s*(\d+)', q_low)
+        if m_id:
+            emp_id = int(m_id.group(1))
+            try:
+                res = get_leave_history.invoke({"employee_id": emp_id})
+                return {"messages": [AIMessage(content=res)]}
+            except Exception:
+                pass
+
+    # Standard HR ReAct workflow for policies, complex questions, etc.
     llm = ChatGroq(model="qwen/qwen3.8-27b", temperature=0, max_tokens=700)
     tools = [
         check_leave_balance, 
@@ -236,7 +448,6 @@ def process_hr_query(state: AgentState):
     ]
     
     agent = create_react_agent(llm, tools)
-    messages = state["messages"]
     
     sys_msg = {
         "role": "system",
@@ -257,21 +468,44 @@ def process_hr_query(state: AgentState):
             "CONVERSATIONAL MEMORY RULE:\n"
             "- Always inspect prior conversation turns carefully: if an Employee ID was provided earlier (e.g. when applying for leave), remember it! Do not ask the user for their Employee ID again.\n"
             "- Tolerate all user typos (e.g. 'app;lied' -> applied, 'reprot' -> report, 'seak' -> sick).\n\n"
-            "CRITICAL INSTRUCTION — ROBUST PARAMETER & REASON EXTRACTION FOR NEW LEAVES:\n"
-            "- Always carefully extract: (1) Employee ID, (2) Number of days, and (3) Reason from the user's request and conversation history.\n"
-            "- Tolerate misspellings, typos, and phonetic variants for reasons! For example:\n"
-            "  * 'seak leave', 'seek leave', 'sick leave', 'illness', 'fever', 'medical', 'hospital', 'doctor' -> extract as 'Sick leave'\n"
-            "  * 'casual', 'personal work', 'family function', 'marriage', 'vacation', 'holiday', 'trip', 'emergency' -> extract as the reason.\n"
-            "- If the user mentions 'as a seak leave', 'reason is ...', 'for medical', 'as vacation', or ANY reason word, YOU ALREADY HAVE THE REASON! DO NOT ASK FOR IT AGAIN!\n\n"
-            "STEP-BY-STEP SEQUENTIAL ELICITATION (ONLY WHEN INFORMATION IS TRULY MISSING):\n"
-            "If and ONLY if any required detail is genuinely missing from the user's input and history, ask for ONLY ONE missing piece at a time:\n"
-            "1. If Employee ID is missing, ask ONLY: 'Could you please provide your Employee ID?'\n"
-            "2. If Employee ID is known but number of leave days is missing, ask ONLY: 'How many days of leave would you like to apply for?'\n"
-            "3. If Employee ID and days are both known but reason is completely missing, ask ONLY: 'What is the reason for your leave (e.g., vacation, family function, medical)?'\n"
-            "4. Once Employee ID, number of days, and reason are known, DO NOT ask any questions! IMMEDIATELY execute 'apply_leave_request' with employee_id, days, and reason!"
+            "CRITICAL INSTRUCTION — NEVER HALLUCINATE OR GUESS EMPLOYEE ID:\n"
+            "- If Employee ID is not provided by the user, you MUST ask for it. Do NOT guess or call tools without it."
         )
     }
     
-    result = agent.invoke({"messages": [sys_msg] + messages})
-    new_messages = result["messages"][1 + len(messages):]
-    return {"messages": new_messages}
+    try:
+        result = agent.invoke({"messages": [sys_msg] + messages})
+        new_messages = result["messages"][1 + len(messages):]
+        return {"messages": new_messages}
+    except Exception as e:
+        err_msg = str(e)
+        # Self-healing recovery for Groq tool schema errors:
+        if "generate_employee_leave_report" in err_msg or "report" in q_low:
+            m_id = re.search(r'\b(\d+)\b', last_user_query) or re.search(r'\b(\d+)\b', err_msg)
+            if m_id:
+                emp_id = int(m_id.group(1))
+                try:
+                    res = generate_employee_leave_report.invoke({"employee_id": emp_id})
+                    return {"messages": [AIMessage(content=res)]}
+                except Exception:
+                    pass
+        elif "check_leave_balance" in err_msg or "balance" in q_low:
+            m_id = re.search(r'\b(\d+)\b', last_user_query) or re.search(r'\b(\d+)\b', err_msg)
+            if m_id:
+                emp_id = int(m_id.group(1))
+                try:
+                    res = check_leave_balance.invoke({"employee_id": emp_id})
+                    return {"messages": [AIMessage(content=res)]}
+                except Exception:
+                    pass
+        elif "get_leave_history" in err_msg or "history" in q_low:
+            m_id = re.search(r'\b(\d+)\b', last_user_query) or re.search(r'\b(\d+)\b', err_msg)
+            if m_id:
+                emp_id = int(m_id.group(1))
+                try:
+                    res = get_leave_history.invoke({"employee_id": emp_id})
+                    return {"messages": [AIMessage(content=res)]}
+                except Exception:
+                    pass
+
+        return {"messages": [AIMessage(content=f"Could you please confirm your Employee ID so I can process your request?")]}

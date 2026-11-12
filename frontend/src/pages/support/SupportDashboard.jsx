@@ -28,6 +28,7 @@ export default function SupportDashboard() {
   const handleAskSupportAI = async (customQuery) => {
     const q = customQuery || query;
     if (!q.trim()) return;
+    setQuery("");
     setChatLoading(true);
     setChatResponse(null);
     try {

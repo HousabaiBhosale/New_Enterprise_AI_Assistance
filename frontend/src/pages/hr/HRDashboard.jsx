@@ -34,6 +34,7 @@ export default function HRDashboard() {
   const handleAskAI = async (customQuery) => {
     const q = customQuery || query;
     if (!q.trim()) return;
+    setQuery("");
     setChatLoading(true);
     setChatResponse(null);
     try {

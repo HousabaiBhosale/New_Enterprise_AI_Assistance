@@ -142,6 +142,9 @@ def process_sales_query(state: AgentState):
         )
     }
     
-    result = agent.invoke({"messages": [sys_msg] + messages})
-    new_messages = result["messages"][1 + len(messages):]
-    return {"messages": new_messages}
+    try:
+        result = agent.invoke({"messages": [sys_msg] + messages})
+        new_messages = result["messages"][1 + len(messages):]
+        return {"messages": new_messages}
+    except Exception as e:
+        return {"messages": [AIMessage(content=f"Could you please confirm your Customer ID, product choice (1, 2, or 3), and desired quantity so I can process your order?")]}

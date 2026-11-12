@@ -566,14 +566,17 @@ def list_reports():
             full_path = os.path.join(REPORTS_DIR, f)
             stat = os.stat(full_path)
             size_mb = f"{stat.st_size / (1024 * 1024):.1f} MB" if stat.st_size >= 1024 * 1024 else f"{stat.st_size / 1024:.1f} KB"
-            created_date = datetime.fromtimestamp(stat.st_mtime).strftime("%b %d, %Y")
+            created_date = datetime.fromtimestamp(stat.st_mtime).strftime("%b %d, %Y %H:%M")
             files.append({
                 "filename": f,
                 "title": f.replace("_", " ").title().replace(".Pdf", "").replace(".Xlsx", ""),
                 "format": "PDF" if f.endswith(".pdf") else "Excel",
                 "date": created_date,
-                "size": size_mb
+                "size": size_mb,
+                "mtime": stat.st_mtime
             })
+    # Sort newest generated reports first
+    files.sort(key=lambda x: x["mtime"], reverse=True)
     return files
 
 @app.post("/api/reports/generate")

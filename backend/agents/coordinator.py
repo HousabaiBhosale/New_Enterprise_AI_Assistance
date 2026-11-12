@@ -158,7 +158,9 @@ def process_query_with_details(
                     msgs.append(HumanMessage(content=text))
                 elif role in ["agent", "ai", "assistant"]:
                     msgs.append(AIMessage(content=text))
-    msgs.append(HumanMessage(content=query))
+    # Deduplicate if history already ends with the current query
+    if not msgs or msgs[-1].content.strip() != query.strip():
+        msgs.append(HumanMessage(content=query))
 
     initial_state = {
         "messages": msgs,
@@ -171,6 +173,7 @@ def process_query_with_details(
     }
     
     # 1. Routing step
+    sup_result = {"next": "hr"}
     try:
         sup_result = supervisor_node(initial_state)
         chosen_agent = sup_result.get("next", "hr")
